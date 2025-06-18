@@ -1,5 +1,5 @@
 class Message < ApplicationRecord
-  after_creawte_commit { broadcast_message }
+  after_create_commit { broadcast_message }
 
   private
 
