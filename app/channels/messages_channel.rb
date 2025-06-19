@@ -4,6 +4,10 @@ class MessagesChannel < ApplicationCable::Channel
     stream_from "MessagesChannel"
   end
 
+  def receive(data)
+    Message.create(body: data["body"])
+  end
+
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
   end
