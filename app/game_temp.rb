@@ -18,14 +18,15 @@ class Game < ApplicationRecord
   attr_accessor :card_set, :players, :state, :turn_log
 
   def initialize
-    @card_set = {}
-    @players = {}
+    @card_set = []
+    @players = []
     @state = "waiting"
-    @turn_log = {}
+    @turn_log = []
 
     generate_new_cards(CARDSETS, 12)
   end
 end
+
 
 def generate_new_cards(matching_sets, total_cards)
   new_cards = []
@@ -50,6 +51,8 @@ def generate_new_cards(matching_sets, total_cards)
       set.each do |id|
         card = {
           id: id,
+          title: "Card #{id}",
+          description: "#{id}.",
           matching_ids: set.reject { |mid| mid == id }
         }
         new_cards.push(card)
@@ -57,5 +60,5 @@ def generate_new_cards(matching_sets, total_cards)
     end
   end
 
-  self.card_set = { set: "random_name", cards: new_cards.shuffle }
+  self.card_set = new_cards.shuffle
 end
