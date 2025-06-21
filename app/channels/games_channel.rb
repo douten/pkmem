@@ -1,32 +1,19 @@
 class GamesChannel < ApplicationCable::Channel
+  before_subscribe :init_game
+
   def connect
     puts "Connecting to GamesChannel"
     # Any setup needed when channel is connected
   end
 
   def subscribed
-    # get user id from parameters or cookies
+    stream_for @game
+  end
 
-    # get game in matching state with user in it
-    # if not then get first game in matching state
-    # if no matching state game then create a new game
-
-    # if user is not part of game, then add in players
-    game.players << current_user
-
-    # if game is a new record
-    if game.new_record?
-      game.state = "matching"
-      game.save
-      puts "Created new game with ID: #{game.id}"
-    else
-      game.state = "playing"
-      game.save
-      puts "Joined existing game with ID: #{game.id}"
-    end
-
-    # stream_from "some_channel"
-    stream_for game
+  def get_game
+    # binding.pry
+    GamesChannel.broadcast_to(@game, { game: @game.attributes })
+    # ActionCable.server.broadcast("GamesChannel:#{@game.id}", { game: @game.attributes })
   end
 
   def receive(data)
@@ -34,17 +21,51 @@ class GamesChannel < ApplicationCable::Channel
     # Game.create(body: data["body"])
   end
 
-  def games_in_matching
-    Game.where(state: "matching", players: { id: current_user.id })
-    Game.where(state: "matching").order(created_at: :asc)
-  end
-
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
   end
 
-  def current_user
-    # cookie of user-id
-    cookies.signed[:user_id]
+  private
+
+  def guest_id
+    connection.guest_id
+  end
+
+  def init_game
+    # get games in matching state
+    in_progress_game = Game.where(state: "playing").select do |game|
+      game[:players]["ids"].include?(guest_id)
+    end
+
+    # if not then get first game in matching state
+    if in_progress_game.empty?
+      game = Game.where(state: "matching").first
+    else
+      game = in_progress_game.first
+    end
+
+    if game.nil?
+      game = Game.new
+    end
+
+    # if game is a new record
+    if game.new_record?
+      game[:players] ||= { ids: [ guest_id ]  }
+      game[:state] = "matching"
+      game.save
+      puts "Created new game with ID: #{game.id}"
+    else
+      game[:players]["ids"] << guest_id unless game[:players]["ids"].include?(guest_id)
+
+      if game[:players]["ids"].length > 1
+        game[:state] = "playing"
+      else
+        game[:state] = "matching"
+      end
+      game.save
+      puts "Joined existing game with ID: #{game.id}"
+    end
+
+    @game = game
   end
 end

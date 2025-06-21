@@ -1,4 +1,7 @@
 class Game < ApplicationRecord
+  attr_accessor :card_set, :players, :state, :log, :match_cards
+  after_initialize :initialize_game
+
   CARDSETS = [
     [ 1, 2, 3 ],
     [ 4, 5, 6 ],
@@ -15,47 +18,42 @@ class Game < ApplicationRecord
     [ 83 ]
   ].freeze
 
-  attr_accessor :card_set, :players, :state, :turn_log
-
-  def initialize
-    @card_set = {}
-    @players = {}
-    @state = "waiting"
-    @turn_log = {}
-
-    generate_new_cards(CARDSETS, 12)
+  def initialize_game
+    generate_new_cards(CARDSETS, 12) if self[:match_cards].nil?
   end
-end
 
-def generate_new_cards(matching_sets, total_cards)
-  new_cards = []
+  def generate_new_cards(matching_sets, total_cards)
+    new_cards = []
 
-  matching_sets.shuffle.each do |set|
-    set_length = set.length < 2 ? 2 : set.length
 
-    if new_cards.length + set_length > total_cards ||
-       new_cards.length + set_length == total_cards - 1
-      next
-    end
+      matching_sets.shuffle.each do |set|
+        set_length = set.length < 2 ? 2 : set.length
 
-    if set.length == 1
-      card = {
-        id: set[0],
-        title: "Card #{set[0]}",
-        description: "#{set[0]}.",
-        matching_ids: [ set[0] ]
-      }
-      new_cards.push(card, card)
-    else
-      set.each do |id|
-        card = {
-          id: id,
-          matching_ids: set.reject { |mid| mid == id }
-        }
-        new_cards.push(card)
+        if new_cards.length + set_length > total_cards ||
+          new_cards.length + set_length == total_cards - 1
+          break
+        end
+
+        if set.length == 1
+          card = {
+            id: set[0],
+            matching_ids: [ set[0] ]
+          }
+          new_cards.push(card, card)
+        else
+          set.each do |id|
+            card = {
+              id: id,
+              matching_ids: set.reject { |mid| mid == id }
+            }
+            new_cards.push(card)
+          end
+        end
+
+        puts "Added set #{set} with #{set_length} cards. Total cards: #{new_cards.length}"
       end
-    end
-  end
 
-  self.card_set = { set: "random_name", cards: new_cards.shuffle }
+
+    self[:match_cards] = { set: SecureRandom.uuid, cards: new_cards.shuffle }
+  end
 end
