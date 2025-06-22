@@ -13,6 +13,7 @@ module ApplicationCable
 
     def guest_id
       session[:guest_id] ||= SecureRandom.uuid
+      puts "===== Guest ID in Connection Cable: #{session[:guest_id]}"
       session[:guest_id]
     end
   end
