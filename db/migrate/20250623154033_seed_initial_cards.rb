@@ -97,14 +97,4 @@ class SeedInitialCards < ActiveRecord::Migration[8.0]
       end
     end
   end
-
-  def down
-    CardSet.find_each do |card_set|
-      card_set.cards.each do |card|
-        card_set.cards.delete(card)
-        card.destroy if card.game_cards.empty? && card.card_set_cards.empty?
-      end
-      card_set.destroy
-    end
-  end
 end
