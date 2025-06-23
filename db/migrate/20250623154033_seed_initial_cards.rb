@@ -83,24 +83,28 @@ class SeedInitialCards < ActiveRecord::Migration[8.0]
     [ 151 ]
   ].freeze
 
-  def change
-    def up
-      CARDSETS.each do |set, index|
-        set = CardSet.create(number: index + 1)
-        set.each do |card_number|
-          # create card if it doesn't already exist
-          if Card.exists?(number: card_number)
-            card = Card.find_by(number: card_number)
-          else
-            card = Card.create(number: card_number)
-          end
-          set.cards << card unless set.cards.include?(card)
+  def up
+    CARDSETS.each_with_index do |set, index|
+      card_set = CardSet.create(number: index + 1)
+      set.each do |card_number|
+        # create card if it doesn't already exist
+        if Card.exists?(number: card_number)
+          card = Card.find_by(number: card_number)
+        else
+          card = Card.create(number: card_number)
         end
+        card_set.cards << card unless card_set.cards.include?(card)
       end
     end
   end
 
   def down
-    # No need to implement down migration for seeding initial data
+    CardSet.find_each do |card_set|
+      card_set.cards.each do |card|
+        card_set.cards.delete(card)
+        card.destroy if card.game_cards.empty? && card.card_set_cards.empty?
+      end
+      card_set.destroy
+    end
   end
 end
