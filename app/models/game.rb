@@ -1,6 +1,13 @@
 class Game < ApplicationRecord
-  attr_accessor :players, :state, :log, :match_cards
-  before_save :populate_match_cards
+  has_many :game_cards, dependent: :destroy
+  has_many :game_players, dependent: :destroy
+  has_many :cards, through: :game_cards
+  has_many :players, through: :game_players
+  has_many :logs, dependent: :destroy
+
+  attr_accessor :state
+
+  before_save :populate_match_cards, if: :has_cards?
 
   CARDSETS = [
     [ 1, 2, 3 ],
@@ -18,12 +25,15 @@ class Game < ApplicationRecord
     [ 83 ]
   ].freeze
 
+  TOTAL_CARDS = 20
+
+  def has_cards?
+    self[:match_cards].blank? || self[:match_cards]["cards"].blank? && self[:match_cards]["cards"]&.length == total_cards
+  end
 
   def populate_match_cards
     new_cards = []
-    total_cards = 20
-
-    return if self[:match_cards].present? && self[:match_cards]["cards"]&.length == total_cards
+    total_cards = TOTAL_CARDS
 
     CARDSETS.shuffle.each do |set|
       set_length = set.length < 2 ? 2 : set.length
@@ -52,6 +62,6 @@ class Game < ApplicationRecord
       puts "Added set #{set} with #{set_length} cards. Total cards: #{new_cards.length}"
     end
 
-    self[:match_cards] = { set: SecureRandom.uuid, cards: new_cards.shuffle }
+    # self[:match_cards] = { set: SecureRandom.uuid, cards: new_cards.shuffle }
   end
 end

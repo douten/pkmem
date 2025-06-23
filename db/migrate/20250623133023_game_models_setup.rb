@@ -14,6 +14,9 @@ class GameModelsSetup < ActiveRecord::Migration[8.0]
     create_table :game_cards do |t|
       t.belongs_to :game
       t.belongs_to :card
+      t.belongs_to :game_player
+      t.boolean :face_up, default: false
+      t.integer :position, default: 0
       t.timestamps
     end
 
@@ -27,7 +30,7 @@ class GameModelsSetup < ActiveRecord::Migration[8.0]
       t.belongs_to :game
       t.string :action
       t.string :item
-      t.jsonb :meta, default: {}
+      t.json :meta, default: {}
       t.timestamps
     end
 
