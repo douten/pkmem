@@ -11,8 +11,23 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def get_game
-    GamesChannel.broadcast_to(@game, { game: @game, cards: @game.game_cards.sort_by(&:position).map(&:card), players: @game.players })
+    game = Game.find(@game.id)
+    GamesChannel.broadcast_to(@game,
+      {
+        game: game.attributes,
+        cards: game.game_cards.sort_by(&:position).map { |gc| generate_card(gc) },
+        opponent: game.players.length > 2 ? game.players.find { |p| p.guest_id != guest_id }.guest_id.last(5) : ''
+      }
+    )
     # ActionCable.server.broadcast("GamesChannel:#{@game.id}", { game: @game.attributes })
+  end
+
+  def flip_card(data)
+    game_card = @game.game_cards.find(data["game_card_id"])
+    game_card.face_up = !game_card.face_up
+    game_card.save
+
+    get_game
   end
 
   def receive(data)
@@ -24,6 +39,13 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   private
+  def generate_card(game_card)
+    gc = { id: game_card.id, flipped: game_card.face_up }
+    if game_card.face_up?
+      gc[:card] = game_card.card
+    end
+    gc
+  end
 
   def guest_id
     connection.guest_id
