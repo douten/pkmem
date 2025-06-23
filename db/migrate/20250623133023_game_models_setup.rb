@@ -6,8 +6,8 @@ class GameModelsSetup < ActiveRecord::Migration[8.0]
     end
 
     create_table :cards do |t|
-      t.belongs_to :cardset
       t.string :name
+      t.integer :number, null: false
       t.timestamps
     end
 
@@ -21,8 +21,14 @@ class GameModelsSetup < ActiveRecord::Migration[8.0]
     end
 
     create_table :card_sets do |t|
-      # has_many :cards
       t.string :name
+      t.integer :number
+      t.timestamps
+    end
+
+    create_table :card_set_cards do |t|
+      t.belongs_to :card_set
+      t.belongs_to :card
       t.timestamps
     end
 

@@ -1,4 +1,4 @@
 class Card < ApplicationRecord
   has_many :games, through: :game_cards
-  belongs_to :cardset, optional: true
+  has_many :card_sets, through: :card_set_cards
 end

@@ -5,31 +5,15 @@ class Game < ApplicationRecord
   has_many :players, through: :game_players
   has_many :logs, dependent: :destroy
 
-  before_save :populate_match_cards, if: :has_cards?
-
-  CARDSETS = [
-    [ 1, 2, 3 ],
-    [ 4, 5, 6 ],
-    [ 7, 8, 9 ],
-    [ 10, 11, 12 ],
-    [ 13, 14, 15 ],
-    [ 16, 17, 18 ],
-    [ 19, 20 ],
-    [ 21, 22 ],
-    [ 23, 24 ],
-    [ 25, 26 ],
-    [ 27, 28 ],
-    [ 29, 30, 31 ],
-    [ 83 ]
-  ].freeze
+  before_save :set_cards, if: :needs_cards?
 
   TOTAL_CARDS = 20
 
-  def has_cards?
-    self[:match_cards].blank? || self[:match_cards]["cards"].blank? && self[:match_cards]["cards"]&.length == total_cards
+  def need_cards?
+    self.cards.blank? && self.players.length == 2
   end
 
-  def populate_match_cards
+  def set_cards
     new_cards = []
     total_cards = TOTAL_CARDS
 
