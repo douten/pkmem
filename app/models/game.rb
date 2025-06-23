@@ -10,11 +10,15 @@ class Game < ApplicationRecord
   # before_save :set_cards, if: :needs_cards?
 
   # validates that cards exist when there's two players
-  validates :cards, length: { is: TOTAL_CARDS }, if: :needs_cards?
+  validates :cards, length: { is: TOTAL_CARDS }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
 
-  def needs_cards?
+  def enough_players?
     self.players.length == 2
+  end
+
+  def needs_cards?
+    self.cards.length < TOTAL_CARDS && enough_players?
   end
 
   def set_cards
@@ -39,6 +43,11 @@ class Game < ApplicationRecord
       else
         self.cards.concat(set.cards)
       end
+    end
+
+    self.game_cards.shuffle.each_with_index do |game_card, index|
+      game_card.position = index
+      game_card.save
     end
   end
 end
