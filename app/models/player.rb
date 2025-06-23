@@ -1,7 +1,12 @@
 class Player < ApplicationRecord
   has_many :games, through: :game_players
 
-  attr_accessor :name, :guest_id, :color
+  validates :guest_id, presence: true
+  validates :guest_id, uniqueness: true
+  before_validation :set_guest_id
 
-  validates :guest_id, presence: true, uniqueness: true
+  private
+    def set_guest_id
+      self.guest_id ||= SecureRandom.uuid
+    end
 end

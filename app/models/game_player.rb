@@ -2,6 +2,4 @@ class GamePlayer < ApplicationRecord
   belongs_to :game
   belongs_to :player
   has_many :game_cards
-
-  attr_accessor :connected, :score
 end

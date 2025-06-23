@@ -5,8 +5,6 @@ class Game < ApplicationRecord
   has_many :players, through: :game_players
   has_many :logs, dependent: :destroy
 
-  attr_accessor :state
-
   before_save :populate_match_cards, if: :has_cards?
 
   CARDSETS = [
