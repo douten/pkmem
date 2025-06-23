@@ -77,7 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_23_154033) do
   create_table "players", force: :cascade do |t|
     t.string "name"
     t.string "guest_id"
-    t.string "color", default: "blue"
+    t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

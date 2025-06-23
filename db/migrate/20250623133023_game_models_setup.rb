@@ -43,7 +43,7 @@ class GameModelsSetup < ActiveRecord::Migration[8.0]
     create_table :players do |t|
       t.string :name
       t.string :guest_id
-      t.string :color, default: "blue"
+      t.string :color
       t.timestamps
     end
 

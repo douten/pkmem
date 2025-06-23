@@ -16,7 +16,7 @@ module Pkmem
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.session_store :cookie_store, key: "_interslice_session", domain: :all
+    config.session_store :cookie_store, key: "_pkmem_session", domain: :all
     config.middleware.use ActionDispatch::Cookies
 
     config.middleware.use config.session_store, config.session_options
