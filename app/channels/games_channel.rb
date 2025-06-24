@@ -54,7 +54,7 @@ class GamesChannel < ApplicationCable::Channel
   # GAME ACTIONS
   def flip_card(data)
     game_card = @game.game_cards.find(data["game_card_id"])
-    game_card.face_up = !game_card.face_up
+    game_card.face_up = true
     game_card.save
 
     get_game
@@ -80,7 +80,7 @@ class GamesChannel < ApplicationCable::Channel
   def generate_card(game_card)
     gc = { id: game_card.id, flipped: game_card.face_up }
     if game_card.face_up?
-      gc[:card] = game_card.card
+      gc[:image_url] = game_card.image_url
     end
     gc
   end
