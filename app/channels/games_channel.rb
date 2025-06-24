@@ -1,5 +1,6 @@
 class GamesChannel < ApplicationCable::Channel
   before_subscribe :init_game
+  after_unsubscribe :cleanup_game
 
   def connect
     puts "Connecting to GamesChannel"
@@ -10,6 +11,22 @@ class GamesChannel < ApplicationCable::Channel
     stream_for @game
   end
 
+  def cleanup_game
+    puts "Cleaning up game with ID: #{@game.id}"
+    @game.players.delete(current_player)
+    @game.save
+
+    if @game.players.empty?
+      @game.destroy
+      puts "Game with ID: #{@game.id} has been destroyed."
+    else
+      @game.save
+      puts "Game with ID: #{@game.id} still has players."
+    end
+
+    get_game
+  end
+
   def get_game
     game = Game.find(@game.id)
     GamesChannel.broadcast_to(@game,
@@ -17,20 +34,13 @@ class GamesChannel < ApplicationCable::Channel
         game: {
           id: game.id,
           state: game.state,
-          opponentId: game.players.where.not(guest_id: guest_id).first.guest_id,
-          cards: game.game_cards.sort_by(&:position).map { |gc| generate_card(gc) }
+          players: game.players.map(&:guest_id),
+          cards: game.game_cards.sort_by(&:position).map { |gc| generate_card(gc) },
+          winner: game.winner_id.nil? ? nil : game.winner_id
         }
       }
     )
     # ActionCable.server.broadcast("GamesChannel:#{@game.id}", { game: @game.attributes })
-  end
-
-  def flip_card(data)
-    game_card = @game.game_cards.find(data["game_card_id"])
-    game_card.face_up = !game_card.face_up
-    game_card.save
-
-    get_game
   end
 
   def receive(data)
@@ -39,6 +49,31 @@ class GamesChannel < ApplicationCable::Channel
 
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
+  end
+
+  # GAME ACTIONS
+  def flip_card(data)
+    game_card = @game.game_cards.find(data["game_card_id"])
+    game_card.face_up = !game_card.face_up
+    game_card.save
+
+    get_game
+  end
+
+  def concede(data)
+    puts "Player #{current_player&.guest_id} conceded the game."
+    game_player_idx = @game.game_players.find_index { |gp| gp.player == current_player }
+    opponent_player_idx = @game.game_players.find_index { |gp| gp.player != current_player }
+
+    @game.game_players[game_player_idx].score = -1
+    @game.game_players[game_player_idx].save
+    @game.game_players[opponent_player_idx].score = 1
+    @game.game_players[opponent_player_idx].save
+    @game.state = "finished"
+
+    @game.save
+
+    get_game
   end
 
   private

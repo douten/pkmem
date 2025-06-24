@@ -50,4 +50,9 @@ class Game < ApplicationRecord
       game_card.save
     end
   end
+
+  def winner_id
+    return nil if self.state != "finished" || self.game_players.length < 2
+    self.game_players.max_by(&:score).player.guest_id
+  end
 end
