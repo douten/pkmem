@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_23_154033) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_24_214456) do
   create_table "card_set_cards", force: :cascade do |t|
     t.integer "card_set_id"
     t.integer "card_id"
@@ -42,6 +42,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_23_154033) do
     t.integer "position", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "scored_by"
+    t.string "flipped_by"
     t.index ["card_id"], name: "index_game_cards_on_card_id"
     t.index ["game_id"], name: "index_game_cards_on_game_id"
     t.index ["game_player_id"], name: "index_game_cards_on_game_player_id"
@@ -62,6 +64,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_23_154033) do
     t.string "state", default: "matching"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "turn", default: "", null: false
   end
 
   create_table "logs", force: :cascade do |t|

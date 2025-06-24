@@ -37,6 +37,10 @@ class GamesChannel < ApplicationCable::Channel
           players: game.players.map(&:guest_id),
           cards: game.game_cards.sort_by(&:position).map { |gc| generate_card(gc) },
           winner: game.winner_id.nil? ? nil : game.winner_id
+        },
+        can_flip: {
+          "#{game.players[0].guest_id}": can_flip(game.players[0]),
+          "#{game.players[1].guest_id}": can_flip(game.players[1])
         }
       }
     )
@@ -51,12 +55,24 @@ class GamesChannel < ApplicationCable::Channel
     # Any cleanup needed when channel is unsubscribed
   end
 
+  def can_flip(player = nil)
+    game = Game.find(@game.id)
+    has_turn = game.turn == player.guest_id
+    # cards flipped up by player, and has no scoredBy
+    flipped_cards = game.game_cards.select do |gc|
+      gc.face_up? && gc.flipped_by == player.guest_id && gc.scored_by.nil?
+    end
+
+    has_turn && flipped_cards.length < 2
+  end
+
   # GAME ACTIONS
   def flip_card(data)
-    game_card = @game.game_cards.find(data["game_card_id"])
+    game = Game.find(@game.id)
+    game_card = game.game_cards.find(data["game_card_id"])
     game_card.face_up = true
+    game_card.flipped_by = current_player.guest_id
     game_card.save
-
     get_game
   end
 
@@ -116,6 +132,7 @@ class GamesChannel < ApplicationCable::Channel
 
       if game.players.length == 2 && game.state == "matching"
         game.state = "playing"
+        game.turn = game.players.first.guest_id
       end
 
       game.save
