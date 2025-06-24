@@ -14,9 +14,12 @@ class GamesChannel < ApplicationCable::Channel
     game = Game.find(@game.id)
     GamesChannel.broadcast_to(@game,
       {
-        game: game.attributes,
-        cards: game.game_cards.sort_by(&:position).map { |gc| generate_card(gc) },
-        opponent: game.players.length > 2 ? game.players.find { |p| p.guest_id != guest_id }.guest_id.last(5) : ''
+        game: {
+          id: game.id,
+          state: game.state,
+          opponentId: game.players.where.not(guest_id: guest_id).first.guest_id,
+          cards: game.game_cards.sort_by(&:position).map { |gc| generate_card(gc) }
+        }
       }
     )
     # ActionCable.server.broadcast("GamesChannel:#{@game.id}", { game: @game.attributes })

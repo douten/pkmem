@@ -1,5 +1,5 @@
 class Game < ApplicationRecord
-  TOTAL_CARDS = 20
+  TOTAL_CARDS = 16
 
   has_many :game_cards, dependent: :destroy
   has_many :game_players, dependent: :destroy
