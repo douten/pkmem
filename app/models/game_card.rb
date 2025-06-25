@@ -10,4 +10,8 @@ class GameCard < ApplicationRecord
       nil
     end
   end
+
+  def matching_number_set
+    self.card.card_sets.first.cards.map(&:number).uniq
+  end
 end
