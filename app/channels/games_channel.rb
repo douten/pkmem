@@ -40,7 +40,6 @@ class GamesChannel < ApplicationCable::Channel
 
   # GAME ACTIONS
   def flip_card(data)
-    @game = Game.find(@game.id)
     if !@game.can_flip?(current_player)
       puts "Player #{current_player.guest_id} cannot flip a card."
       return
@@ -51,12 +50,13 @@ class GamesChannel < ApplicationCable::Channel
       face_up: true,
       flipped_by: current_player.guest_id
     )
+
     puts "======= game_card flipped by player #{current_player.guest_id} ======="
     puts game_card.inspect
     broadcast_game
 
     # game progresses / validation of action, then broadcast the game state
-    delay_update = Game.find(@game.id).progress_game(current_player)
+    delay_update = @game.progress_game(current_player)
     broadcast_game({ delay: delay_update ? 1000 : 0 })
   end
 
@@ -72,10 +72,10 @@ class GamesChannel < ApplicationCable::Channel
   private
 
   def broadcast_game(opts = {})
-    game = Game.find(@game.id)
+    @game.reload
 
-    GamesChannel.broadcast_to(game,
-      game.stream(opts)
+    GamesChannel.broadcast_to(@game,
+      @game.stream(opts)
     )
   end
 

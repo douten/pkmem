@@ -34,12 +34,13 @@ class Game < ApplicationRecord
   end
 
   def can_flip?(player = nil)
+    self.reload
+
     player_flipped_game_cards = flipped_game_cards(player)
     has_turn = self.turn == player.guest_id
 
     # dynamically check if player can flip cards based on the game state
     return false if player.nil? || self.state != "playing" || !has_turn
-
     return true if player_flipped_game_cards.length < 2
 
 
@@ -68,6 +69,8 @@ class Game < ApplicationRecord
   end
 
   def progress_game(player = nil)
+    self.reload
+
     player_flipped_game_cards = flipped_game_cards(player)
     puts "============ progress_game ============"
     puts "player: #{player&.guest_id}"
