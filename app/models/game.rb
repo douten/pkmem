@@ -72,12 +72,9 @@ class Game < ApplicationRecord
     self.reload
 
     player_flipped_game_cards = flipped_game_cards(player)
-    puts "============ progress_game ============"
-    puts "player: #{player&.guest_id}"
-    puts "player_flipped_game_cards: #{player_flipped_game_cards.inspect}"
     return false if player.nil? || !player_flipped_game_cards || player_flipped_game_cards.length < 2
 
-    matching_number_set = player_flipped_game_cards.first.matching_number_set
+    matching_number_set = player_flipped_game_cards.last.matching_number_set
 
     non_matching_cards = player_flipped_game_cards.select do |flipped_game_card|
       !matching_number_set.include?(flipped_game_card.card.number)
