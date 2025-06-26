@@ -121,6 +121,23 @@ class Game < ApplicationRecord
     non_matching_cards.length > 0 # determines if the game should 'reset' the flipped cards
   end
 
+  def concede(player = nil)
+    return false if player.nil? || !self.players.include?(player)
+
+    current_player = self.game_players.find { |p| p.guest_id == player.guest_id }
+    opponent_player = self.game_players.find { |p| p.guest_id != player.guest_id }
+
+    if current_player && opponent_player
+      current_player.update_attribute!(:score, -1)
+      opponent_player.update_attribute!(:score, 1)
+      self.update_attribute!(:state, "finished")
+      self.reload
+      true
+    else
+      false
+    end
+  end
+
   private
   # STREAM DATA
   # This is the data that will be sent to the client via ActionCable

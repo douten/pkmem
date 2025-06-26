@@ -72,10 +72,7 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def concede(data)
-    puts "Player #{current_player&.guest_id} conceded the game."
-    current_player.update_attribute!(:score, -1)
-    opponent_player.update_attribute!(:score, 1)
-    @game.update_attribute!(:state, "finished")
+    @game.concede(current_player)
 
     broadcast_game
   end
