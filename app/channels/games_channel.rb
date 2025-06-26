@@ -1,7 +1,6 @@
 class GamesChannel < ApplicationCable::Channel
-  before_subscribe :init_game
   # after_subscribe :set_game
-  after_unsubscribe :cleanup_game
+  # after_unsubscribe :cleanup_game
 
   # CHANNEL CALLBACKS
   def connect
@@ -10,6 +9,18 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def subscribed
+    game_id = params[:game_id]
+    connection.game_channel = game_id
+    players_in_game_channel = ActionCable.server.connections.select { |con| con.game_channel == game_id }.length
+
+    @game = Game.find_by(id: game_id)
+
+    if players_in_game_channel == 2
+      @game.update(state: "playing")
+    end
+
+    @game.reload
+
     stream_for @game
   end
 
@@ -17,21 +28,21 @@ class GamesChannel < ApplicationCable::Channel
     puts "Received data: #{data.inspect}"
   end
 
-  def cleanup_game
-    puts "Cleaning up game with ID: #{@game.id}"
-    @game.players.delete(current_player)
-    @game.save
+  # def cleanup_game
+  #   puts "Cleaning up game with ID: #{@game.id}"
+  #   @game.players.delete(current_player)
+  #   @game.save
 
-    if @game.players.empty?
-      @game.destroy
-      puts "Game with ID: #{@game.id} has been destroyed."
-    else
-      @game.save
-      puts "Game with ID: #{@game.id} still has players."
-    end
+  #   if @game.players.empty?
+  #     @game.destroy
+  #     puts "Game with ID: #{@game.id} has been destroyed."
+  #   else
+  #     @game.save
+  #     puts "Game with ID: #{@game.id} still has players."
+  #   end
 
-    get_game
-  end
+  #   get_game
+  # end
 
   # CLIENT ACTIONS (actions sent in from client)
   def get_game
@@ -77,43 +88,6 @@ class GamesChannel < ApplicationCable::Channel
     GamesChannel.broadcast_to(@game,
       @game.stream(opts)
     )
-  end
-
-  def init_game
-    # get games in matching state
-    in_progress_game = Game.where(state: "playing").select do |game|
-      game.players.include?(current_player)
-    end
-
-    # if not then get first game in matching state
-    if in_progress_game.empty?
-      game = Game.where(state: "matching").first
-    else
-      game = in_progress_game.first
-    end
-
-    if game.nil?
-      game = Game.new
-    end
-
-    # if game is a new record
-    if game.new_record?
-      game.players << current_player
-      game.save
-      puts "Created new game with ID: #{game.id}"
-    else
-      game.players << current_player unless game.players.include?(current_player)
-
-      if game.players.length == 2 && game.state == "matching"
-        game.state = "playing"
-        game.turn = game.players.first.guest_id
-      end
-
-      game.save
-      puts "Joined existing game with ID: #{game.id}"
-    end
-
-    @game = Game.find(game.id)
   end
 
   def current_player

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_214456) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_26_155705) do
   create_table "card_set_cards", force: :cascade do |t|
     t.integer "card_set_id"
     t.integer "card_id"
@@ -83,5 +83,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_214456) do
     t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status", default: "inactive", null: false
+    t.index ["guest_id"], name: "index_players_on_guest_id", unique: true
+    t.index ["status"], name: "index_players_on_status"
   end
 end
