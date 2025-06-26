@@ -1,5 +1,5 @@
 class GamesChannel < ApplicationCable::Channel
-  # after_subscribe :set_game
+  after_subscribe :init_game
   # after_unsubscribe :cleanup_game
 
   # CHANNEL CALLBACKS
@@ -11,15 +11,7 @@ class GamesChannel < ApplicationCable::Channel
   def subscribed
     game_id = params[:game_id]
     connection.game_id = game_id
-    players_in_game_channel = ActionCable.server.connections.select { |con| con.game_id == game_id }.length
-
     @game = Game.find(game_id)
-
-    if players_in_game_channel == 2
-      @game.update(state: "playing")
-    end
-
-    @game.reload
 
     stream_for @game
   end
@@ -28,21 +20,20 @@ class GamesChannel < ApplicationCable::Channel
     puts "Received data: #{data.inspect}"
   end
 
-  # def cleanup_game
-  #   puts "Cleaning up game with ID: #{@game.id}"
-  #   @game.players.delete(current_player)
-  #   @game.save
+  def init_game
+    unless @game.state == "finished"
+      # this ensures the two players are in the game channel
+      players_in_game_channel = ActionCable.server.connections.select { |con| con.game_id == @game.id }.length
 
-  #   if @game.players.empty?
-  #     @game.destroy
-  #     puts "Game with ID: #{@game.id} has been destroyed."
-  #   else
-  #     @game.save
-  #     puts "Game with ID: #{@game.id} still has players."
-  #   end
+      if players_in_game_channel == 2
+        @game.update(state: "playing") unless @game.state == "finished"
+      end
 
-  #   get_game
-  # end
+      @game.reload
+    end
+
+    broadcast_game
+  end
 
   # CLIENT ACTIONS (actions sent in from client)
   def get_game
