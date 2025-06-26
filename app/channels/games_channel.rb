@@ -10,10 +10,10 @@ class GamesChannel < ApplicationCable::Channel
 
   def subscribed
     game_id = params[:game_id]
-    connection.game_channel = game_id
-    players_in_game_channel = ActionCable.server.connections.select { |con| con.game_channel == game_id }.length
+    connection.game_id = game_id
+    players_in_game_channel = ActionCable.server.connections.select { |con| con.game_id == game_id }.length
 
-    @game = Game.find_by(id: game_id)
+    @game = Game.find(game_id)
 
     if players_in_game_channel == 2
       @game.update(state: "playing")

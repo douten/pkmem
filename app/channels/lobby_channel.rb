@@ -1,10 +1,10 @@
 class LobbyChannel < ApplicationCable::Channel
   after_subscribe :pair_players
+  before_unsubscribe :clean_up
 
   def subscribed
     player = Player.find_by(guest_id: connection.guest_id)
     player.update(status: "active") if !player.nil?
-    # reload player to ensure the status is updated
 
     # stream from main lobby channel for lobby stats
     stream_from "lobby_channel"
@@ -12,14 +12,24 @@ class LobbyChannel < ApplicationCable::Channel
     stream_from player_lobby_channel
   end
 
-  def unsubscribed
-    Player.find_by(guest_id: connection.guest_id).update(status: "inactive")
-    broadcast_lobby_stats
+  def clean_up
+    if !connection.game_id
+      Player.find_by(guest_id: connection.guest_id).update(status: "inactive")
+      broadcast_lobby_stats
+    end
   end
 
   # CLIENT ACTIONS (actions sent in from client)
   def get_lobby_stats
     broadcast_lobby_stats
+  end
+
+  def join_game
+    Player.find_by(guest_id: connection.guest_id).update(status: "playing")
+    ActionCable.server.broadcast(player_lobby_channel, {
+      is_playing: true
+    })
+    stop_all_streams
   end
 
   private

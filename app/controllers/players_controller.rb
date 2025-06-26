@@ -1,8 +1,20 @@
 class PlayersController < ApplicationController
-  def get_id
+  def get_player
     guest_id = session[:guest_id] || Player.create.guest_id
     session[:guest_id] = guest_id
+    player = Player.find_by(guest_id: guest_id)
 
-    render json: { id: guest_id }
+    response = { id: player.guest_id }
+
+    if player.status == "playing"
+      games_in_progress = Game.where(state: "playing")
+      player_playing_game = games_in_progress.find { |game| game.players.include?(player) }
+
+      if player_playing_game
+        response[:game_id] = player_playing_game.id
+      end
+    end
+
+    render json: response
   end
 end

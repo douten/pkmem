@@ -12,5 +12,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   #
-  get "/players/get_id", to: "players#get_id", as: :get_player_id
+  get "/players/get_player", to: "players#get_player", as: :get_player
+
+  # post route for '/games/{game_id}/concede'
+  post "/games/:game_id/concede", to: "games#concede", as: :concede_game
 end
