@@ -1,5 +1,5 @@
 class Game < ApplicationRecord
-  TOTAL_CARDS = 16
+  TOTAL_CARDS_ON_BOARD = 16
 
   has_many :game_cards, dependent: :destroy
   has_many :game_players, dependent: :destroy
@@ -11,7 +11,7 @@ class Game < ApplicationRecord
   before_save :cleanup_game, if: :will_save_change_to_state?
 
   # validates that cards exist when there's two players
-  validates :cards, length: { is: TOTAL_CARDS }, if: :enough_players?
+  validates :cards, length: { is: TOTAL_CARDS_ON_BOARD }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
 
   def stream(opts = {})
@@ -63,13 +63,28 @@ class Game < ApplicationRecord
   end
 
   def progress_game(player = nil)
+    # The game progresses in this general flow:
+    # 1. Check if the player can flip cards
+    # 2. a. If they can, continue flipping cards
+    #    b. If they can't, reset the flipped cards
+    # 3. If the card matches, score the cards
+    # 4. If all cards are flipped, end the game and score players
+
     self.reload
 
+    # Start with all the cards flipped by player
     player_flipped_game_cards = flipped_game_cards(player)
+
+    # If the player has no flipped cards, or less than 2, they can continue flipping
+    # Returning false will not delay(interval) the front end state update
     return false if player.nil? || !player_flipped_game_cards || player_flipped_game_cards.length < 2
 
+    # Find the matching set of the flipped cards. In the future we can
+    # compare to all sets of flipped cards, but for now we just use the last
     matching_number_set = player_flipped_game_cards.last.matching_number_set
 
+    # If there's a flipped card that doesn't match the set then it's a sign
+    # the player can't continue flipping cards
     non_matching_cards = player_flipped_game_cards.select do |flipped_game_card|
       !matching_number_set.include?(flipped_game_card.card.number)
     end
@@ -80,6 +95,7 @@ class Game < ApplicationRecord
     opponent_player = self.players.find { |p| p.guest_id != player.guest_id }
 
     if non_matching_cards.length > 0
+      # resetting cards since they don't match
       player_flipped_game_cards.each do |game_card|
         game_card.update({
           flipped_by: nil,
@@ -88,6 +104,7 @@ class Game < ApplicationRecord
       end
       self.update({ turn: opponent_player.guest_id })
     elsif all_matching_cards
+      # If all flipped cards match, we score the cards
       puts "Cards matched by player #{player.guest_id}."
       player_flipped_game_cards.each do |game_card|
         game_card.update({ scored_by: player.guest_id })
@@ -95,10 +112,10 @@ class Game < ApplicationRecord
       self.update({ turn: opponent_player.guest_id })
     end
 
+    # This logic determines if the game is finished
     if all_game_cards_flipped?
-      opponent = self.players.find { |p| p.guest_id != player.guest_id }
       player_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == player.guest_id }.length
-      opponent_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == opponent.guest_id }.length
+      opponent_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == opponent_player.guest_id }.length
 
       self.game_players.each do |game_player|
         if game_player.player.guest_id == player.guest_id
@@ -112,7 +129,9 @@ class Game < ApplicationRecord
       self.update({ state: "finished" })
     end
 
-    non_matching_cards.length > 0 # determines if the game should 'reset' the flipped cards
+    # Returning true will delay(interval) the front end state update
+    # So the player will have time to see the flipped cards, before they flip down
+    non_matching_cards.length > 0
   end
 
   def concede(player = nil)
@@ -184,7 +203,7 @@ class Game < ApplicationRecord
 
   # MODEL ACTIONS
   def set_cards
-    total_cards = TOTAL_CARDS
+    total_cards = TOTAL_CARDS_ON_BOARD
 
     CardSet.all.shuffle.each do |set|
       number_of_cards_to_add = set.cards.length < 2 ? 2 : set.cards.length
@@ -226,7 +245,7 @@ class Game < ApplicationRecord
   end
 
   def needs_cards?
-    self.cards.length < TOTAL_CARDS && enough_players?
+    self.cards.length < TOTAL_CARDS_ON_BOARD && enough_players?
   end
 
   def all_game_cards_flipped?
