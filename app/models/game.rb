@@ -8,6 +8,7 @@ class Game < ApplicationRecord
   has_many :logs, dependent: :destroy
 
   # before_save :set_cards, if: :needs_cards?
+  before_save :cleanup_game, if: :will_save_change_to_state?
 
   # validates that cards exist when there's two players
   validates :cards, length: { is: TOTAL_CARDS }, if: :enough_players?
@@ -131,6 +132,11 @@ class Game < ApplicationRecord
     end
   end
 
+  def winner_id
+    return nil if self.state != "finished" || self.game_players.length < 2
+    self.game_players.max_by(&:score).player.guest_id
+  end
+
   private
   # STREAM DATA
   # This is the data that will be sent to the client via ActionCable
@@ -207,6 +213,13 @@ class Game < ApplicationRecord
     end
   end
 
+  def cleanup_game
+    # If the game is finished, destroy all game cards
+    if self.state == "finished"
+      self.game_cards.destroy_all
+    end
+  end
+
   # DYNAMIC ATTRIBUTES
   def enough_players?
     self.players.length == 2
@@ -220,10 +233,5 @@ class Game < ApplicationRecord
     self.game_cards.all? do |game_card|
       game_card.face_up? && game_card.scored_by
     end
-  end
-
-  def winner_id
-    return nil if self.state != "finished" || self.game_players.length < 2
-    self.game_players.max_by(&:score).player.guest_id
   end
 end
