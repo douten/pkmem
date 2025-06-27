@@ -1,6 +1,6 @@
 class GamesChannel < ApplicationCable::Channel
   after_subscribe :init_game
-  before_unsubscribe_unsubscribe :cleanup_game
+  before_unsubscribe :cleanup_game
 
   # CHANNEL CALLBACKS
   def connect
