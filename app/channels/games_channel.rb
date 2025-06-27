@@ -40,9 +40,12 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def cleanup_game
-    current_player.game_player.update(connected: false)
-    current_player.update(status: "inactive")
+    current_game_player = @game.game_players.select { |gp| gp.player.guest_id == connection.guest_id }.first
+    current_game_player.update(connected: false)
+    current_game_player.player.update(status: "inactive")
     broadcast_game
+
+    @game.update(state: "waiting") if @game.state == "playing"
 
     if @game.game_players.all? { |gp| !gp.connected }
       puts "All players disconnected, cleaning up game."

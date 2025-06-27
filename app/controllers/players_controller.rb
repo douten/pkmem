@@ -6,13 +6,11 @@ class PlayersController < ApplicationController
 
     response = { id: player.guest_id }
 
-    if player.status == "playing"
-      games_in_progress = Game.where(state: "playing")
-      player_playing_game = games_in_progress.find { |game| game.players.include?(player) }
+    games_in_progress = Game.where(state: "waiting")
+    player_playing_game = games_in_progress.find { |game| game.players.include?(player) }
 
-      if player_playing_game
-        response[:game_id] = player_playing_game.id
-      end
+    if player_playing_game
+      response[:game_id] = player_playing_game.id
     end
 
     render json: response
