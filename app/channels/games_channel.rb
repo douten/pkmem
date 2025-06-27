@@ -1,6 +1,6 @@
 class GamesChannel < ApplicationCable::Channel
   after_subscribe :init_game
-  # after_unsubscribe :cleanup_game
+  before_unsubscribe_unsubscribe :cleanup_game
 
   # CHANNEL CALLBACKS
   def connect
@@ -25,14 +25,35 @@ class GamesChannel < ApplicationCable::Channel
       # this ensures the two players are in the game channel
       players_in_game_channel = ActionCable.server.connections.select { |con| con.game_id == @game.id }.length
 
-      if players_in_game_channel == 2
-        @game.update(state: "playing") unless @game.state == "finished"
+      if players_in_game_channel == 2 && @game.state != "finished"
+        @game.game_players.each do |game_player|
+          game_player.update(connected: true)
+          game_player.player.update(status: "playing")
+        end
+        @game.update(state: "playing")
       end
 
       @game.reload
     end
 
     broadcast_game
+  end
+
+  def cleanup_game
+    current_player.game_player.update(connected: false)
+    current_player.update(status: "inactive")
+    broadcast_game
+
+    if @game.game_players.all? { |gp| !gp.connected }
+      puts "All players disconnected, cleaning up game."
+      @game.destroy
+    else
+      puts "Not all players disconnected, game will remain active."
+    end
+  rescue StandardError => e
+    puts "Error during cleanup: #{e.message}"
+    # Handle any cleanup errors gracefully
+    @game.update(state: "error") if @game.present?
   end
 
   # CLIENT ACTIONS (actions sent in from client)

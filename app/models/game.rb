@@ -43,7 +43,6 @@ class Game < ApplicationRecord
     return false if player.nil? || self.state != "playing" || !has_turn
     return true if player_flipped_game_cards.length < 2
 
-
     # we can just check for the first flipped card's matching number set
     # as all cards need to match *a* set
     matching_number_set = player_flipped_game_cards&.first.matching_number_set
@@ -54,12 +53,6 @@ class Game < ApplicationRecord
     # when 2+ cards are flipped, and there's a non-matching card
     # then the set does not match
     non_matching_set = non_matching_cards.length > 0 && player_flipped_game_cards.length > 1
-
-    puts "============ can_flip? player: #{player.guest_id.last(4)} ============"
-    puts "has_turn: #{has_turn}"
-    puts "player_flipped_game_cards.length: #{player_flipped_game_cards.length}"
-    puts "max_flippable_cards: #{max_flippable_cards}"
-    puts "non_matching_set: #{non_matching_set}"
 
     # in order for a player to flip cards:
     # 1. they must have the turn
