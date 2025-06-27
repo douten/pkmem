@@ -25,7 +25,7 @@ class GamesChannel < ApplicationCable::Channel
       # this ensures the two players are in the game channel
       players_in_game_channel = ActionCable.server.connections.select { |con| con.game_id == @game.id }.length
 
-      if players_in_game_channel == 2 && @game.state != "finished"
+      if players_in_game_channel == 2
         @game.game_players.each do |game_player|
           game_player.update(connected: true)
           game_player.player.update(status: "playing")

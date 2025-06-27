@@ -2,6 +2,10 @@ class LobbyChannel < ApplicationCable::Channel
   after_subscribe :pair_players
   before_unsubscribe :cleanup_lobby
 
+  # LobbyChannel is used as initial channel to match players
+  # They'll then be moved to a GameChannel w/ #join_game
+  # which triggers the frontend to subscribe to the GameChannel
+
   def subscribed
     # mark player as active in the lobby
     player = Player.find_by(guest_id: connection.guest_id)
