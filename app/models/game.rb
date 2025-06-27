@@ -16,7 +16,8 @@ class Game < ApplicationRecord
 
   def stream(opts = {})
     game_stream = {
-      game: stream_game
+      game: stream_game,
+      delay: 0
     }
 
     if opts[:delay]

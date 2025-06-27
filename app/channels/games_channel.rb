@@ -1,6 +1,6 @@
 class GamesChannel < ApplicationCable::Channel
-  after_subscribe :init_game
-  before_unsubscribe :cleanup_game
+  after_subscribe :init_game, if: -> { @game.present? }
+  before_unsubscribe :cleanup_game, if: -> { @game.present? }
 
   # CHANNEL CALLBACKS
   def connect
@@ -9,11 +9,14 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def subscribed
-    game_id = params[:game_id]
-    connection.game_id = game_id
-    @game = Game.find(game_id)
-
-    stream_for @game
+    begin
+      game_id = params[:id]
+      @game = Game.find(game_id)
+      stream_for @game
+      connection.game_id = @game.id
+    rescue ActiveRecord::RecordNotFound
+      reject
+    end
   end
 
   def receive(data)
@@ -98,7 +101,7 @@ class GamesChannel < ApplicationCable::Channel
     @game.reload
 
     GamesChannel.broadcast_to(@game,
-      @game.stream(opts)
+      games_channel: { **@game.stream(opts) }
     )
   end
 

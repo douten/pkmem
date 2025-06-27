@@ -4,7 +4,11 @@ class PlayersController < ApplicationController
     session[:guest_id] = guest_id
     player = Player.find_by(guest_id: guest_id)
 
-    response = { id: player.guest_id }
+    # should match PlayerInterface in the frontend
+    response = {
+      id: player.guest_id,
+      game_id: nil
+    }
 
     games_in_progress = Game.where(state: "waiting")
     player_playing_game = games_in_progress.find { |game| game.players.include?(player) }
