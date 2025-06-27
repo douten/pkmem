@@ -5,7 +5,7 @@ class GamesController < ApplicationController
 
     if game && player && game.players.include?(player)
       GamesChannel.broadcast_to(game,
-        game.stream
+        games_channel: { **game.stream }
       ) if game.concede(player)
       render json: { status: "success", message: "Game conceded successfully." }, status: :ok
     else

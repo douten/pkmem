@@ -142,9 +142,9 @@ class Game < ApplicationRecord
     opponent_player = self.game_players.find { |p| p.guest_id != player.guest_id }
 
     if current_player && opponent_player
-      current_player.update_attribute!(:score, -1)
-      opponent_player.update_attribute!(:score, 1)
-      self.update_attribute!(:state, "finished")
+      current_player.update({ score: -1 })
+      opponent_player.update({ score: 1 })
+      self.update({ state: "finished" })
       self.reload
       true
     else
