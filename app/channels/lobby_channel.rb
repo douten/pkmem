@@ -20,7 +20,7 @@ class LobbyChannel < ApplicationCable::Channel
 
   def cleanup_lobby
     if !connection.game_id
-      Player.find_by(guest_id: connection.guest_id).update(status: "inactive")
+      Player.find_by(guest_id: connection.guest_id).update(status: "inactive") if Player.find_by(guest_id: connection.guest_id)
       broadcast_lobby_stats
     end
   end

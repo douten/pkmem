@@ -1,8 +1,19 @@
 class PlayersController < ApplicationController
   def get_player
-    guest_id = session[:guest_id] || Player.create.guest_id
-    session[:guest_id] = guest_id
+    if session[:guest_id].nil?
+      session[:guest_id] = Player.create!.guest_id
+    elsif Player.find_by(guest_id: session[:guest_id]).nil?
+      session[:guest_id] = Player.create!.guest_id
+    end
+
+    guest_id = session[:guest_id]
     player = Player.find_by(guest_id: guest_id)
+
+    # possible for a session guest_id to not have a matching player
+    if player.nil?
+      player = Player.create!
+      session[:guest_id] = player.guest_id
+    end
 
     # should match PlayerInterface in the frontend
     response = {
