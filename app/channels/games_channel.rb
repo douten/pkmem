@@ -50,7 +50,7 @@ class GamesChannel < ApplicationCable::Channel
 
     @game.update(state: "waiting") if @game.state == "playing"
 
-    if @game.game_players.all? { |gp| !gp.connected }
+    if @game.game_players.all? { |gp| !gp.connected } && @game.state != "finished"
       puts "All players disconnected, cleaning up game."
       @game.destroy
     else
