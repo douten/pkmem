@@ -94,5 +94,5 @@ Rails.application.configure do
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   #
 
-  config.action_cable.allowed_request_origins = [ "http://192.168.86.230:5173" ]
+  config.action_cable.allowed_request_origins = [ "https://pkm.minh.codes" ]
 end
