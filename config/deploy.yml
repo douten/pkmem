@@ -9,9 +9,6 @@ servers:
   web:
     hosts:
       - 54.144.64.110
-    # options:
-    #   publish:
-    #     - "3000:3000" # HostPort:ContainerPort
 
   # job:
   #   hosts:
