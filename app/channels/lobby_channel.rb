@@ -61,11 +61,6 @@ class LobbyChannel < ApplicationCable::Channel
       })
       player.update(status: "playing")
     end
-
-    # GameChannel init_game checks for connection.game_id so we'll set it here
-    connection.game_id = game.id
-
-    stop_all_streams
   end
 
   # CALLBACKS
