@@ -21,8 +21,7 @@ class PlayersController < ApplicationController
       game_id: nil
     }
 
-    games_in_progress = Game.where(state: "waiting")
-    player_playing_game = games_in_progress.find { |game| game.players.include?(player) }
+     player_playing_game = Game.joins(:players).where(state: "waiting", players: { id: player.id }).first
 
     if player_playing_game
       response[:game_id] = player_playing_game.id

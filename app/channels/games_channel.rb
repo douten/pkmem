@@ -12,8 +12,11 @@ class GamesChannel < ApplicationCable::Channel
     begin
       game_id = params[:id]
       @game = Game.find(game_id)
+      game_player = @game.game_players.find_by(player: current_player)
+      game_player.update(connected: true) if game_player.present?
+      current_player.update(status: "active") if current_player.present?
+
       stream_for @game
-      connection.game_id = @game.id
     rescue ActiveRecord::RecordNotFound
       reject
     end
@@ -26,11 +29,11 @@ class GamesChannel < ApplicationCable::Channel
   def init_game
     unless @game.state == "finished"
       # this ensures the two players are in the game channel
-      players_in_game_channel = ActionCable.server.connections.select { |con| con.game_id == @game.id }.length
+      connected_game_players = @game.game_players.select { |gp| gp.connected }
 
-      if players_in_game_channel == 2
+
+      if connected_game_players.count == 2
         @game.game_players.each do |game_player|
-          game_player.update(connected: true)
           game_player.player.update(status: "playing")
         end
         @game.update(state: "playing")

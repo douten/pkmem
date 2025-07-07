@@ -19,10 +19,8 @@ class LobbyChannel < ApplicationCable::Channel
   end
 
   def cleanup_lobby
-    if !connection.game_id
-      Player.find_by(guest_id: connection.guest_id).update(status: "inactive")
-      broadcast_lobby_stats
-    end
+    Player.find_by(guest_id: connection.guest_id).update(status: "inactive")
+    broadcast_lobby_stats
   end
 
   # CLIENT ACTIONS (actions sent in from client)
