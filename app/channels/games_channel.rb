@@ -1,6 +1,7 @@
 class GamesChannel < ApplicationCable::Channel
-  after_subscribe :init_game, if: -> { @game.present? }
-  before_unsubscribe :cleanup_game, if: -> { @game.present? }
+  after_subscribe :init_game, if: -> { @game.present? && @game.state != "finished" }
+  after_subscribe :broadcast_game, if: -> { @game.present? && @game.state == "finished" }
+  after_unsubscribe :cleanup_game, if: -> { @game.present? }
 
   # CHANNEL CALLBACKS
   def connect
@@ -27,27 +28,24 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def init_game
-    unless @game.state == "finished"
-      # this ensures the two players are in the game channel
-      connected_game_players = @game.game_players.select { |gp| gp.connected }
+    # this ensures the two players are in the game channel
+    connected_game_players = @game.game_players.select { |gp| gp.connected }
 
-
-      if connected_game_players.count == 2
-        @game.game_players.each do |game_player|
-          game_player.player.update(status: "playing")
-        end
-        @game.update(state: "playing")
+    if connected_game_players.count == 2
+      @game.game_players.each do |game_player|
+        game_player.player.update(status: "playing")
       end
-
-      @game.reload
+      @game.update(state: "playing")
     end
+
+    @game.reload
 
     broadcast_game
   end
 
   def cleanup_game
     current_game_player = @game.game_players.select { |gp| gp.player.guest_id == connection.guest_id }.first
-    current_game_player.update(connected: false)
+    current_game_player.update(connected: false) if current_game_player.present?
     current_game_player.player.update(status: "inactive")
     broadcast_game
 
