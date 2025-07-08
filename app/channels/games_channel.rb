@@ -11,11 +11,11 @@ class GamesChannel < ApplicationCable::Channel
 
   def subscribed
     begin
-      game_id = params[:id]
+      game_id = params[:game_id]
       @game = Game.find(game_id)
       game_player = @game.game_players.find_by(player: current_player)
       game_player.update(connected: true) if game_player.present?
-      current_player.update(status: "active") if current_player.present?
+      current_player.update(status: "playing") if current_player.present?
 
       stream_for @game
     rescue ActiveRecord::RecordNotFound
@@ -50,10 +50,8 @@ class GamesChannel < ApplicationCable::Channel
   def cleanup_game
     current_game_player = @game.game_players.select { |gp| gp.player.guest_id == connection.guest_id }.first
     current_game_player.update(connected: false) if current_game_player.present?
-    current_game_player.player.update(status: "inactive")
+    current_game_player.player.update(status: "inactive") if current_game_player.present?
     broadcast_game
-
-    @game.update(state: "waiting") if @game.state == "playing"
 
     if @game.game_players.all? { |gp| !gp.connected } && @game.state != "finished"
       puts "All players disconnected, cleaning up game."

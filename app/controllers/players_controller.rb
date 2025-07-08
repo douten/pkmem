@@ -21,7 +21,7 @@ class PlayersController < ApplicationController
       game_id: nil
     }
 
-     player_playing_game = Game.joins(:players).where(state: "waiting", players: { id: player.id }).first
+    player_playing_game = Game.joins(:players).where(state: "playing", players: { id: player.id }).first
 
     if player_playing_game
       response[:game_id] = player_playing_game.id

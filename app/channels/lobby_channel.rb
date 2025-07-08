@@ -68,7 +68,7 @@ class LobbyChannel < ApplicationCable::Channel
     if active_players.count >= 2
       current_player = Player.find_by(guest_id: connection.guest_id)
       opponent_player = active_players.find do |opponent|
-        opponent.guest_id != current_player.guest_id && opponent.status == "active"
+        opponent.guest_id != current_player.guest_id
       end
 
       broadcast_matched_players([ current_player, opponent_player ])
