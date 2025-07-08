@@ -24,6 +24,10 @@ class Game < ApplicationRecord
       game_stream[:delay] = opts[:delay]
     end
 
+    if opts[:images_array]
+      game_stream[:images_array] = self.cards.map(&:image_url)
+    end
+
     game_stream
   end
 

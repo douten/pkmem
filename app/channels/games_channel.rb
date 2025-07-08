@@ -40,7 +40,11 @@ class GamesChannel < ApplicationCable::Channel
 
     @game.reload
 
-    broadcast_game
+    if params[:get_images]
+      broadcast_game({ images_array: true })
+    else
+      broadcast_game
+    end
   end
 
   def cleanup_game
