@@ -9,5 +9,9 @@ module ApplicationCable
     def session
       @request.session
     end
+
+    def player
+      Player.find_by(guest_id: guest_id)
+    end
   end
 end

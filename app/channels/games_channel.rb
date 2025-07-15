@@ -1,7 +1,8 @@
 class GamesChannel < ApplicationCable::Channel
-  after_subscribe :init_game, if: -> { @game.present? && @game.state != "finished" }
-  after_subscribe :broadcast_game, if: -> { @game.present? && @game.state == "finished" }
-  after_unsubscribe :cleanup_game, if: -> { @game.present? }
+  after_subscribe :init_player, if: -> { @game.present? && @game.state != "finished" }
+  after_subscribe :init_game, if: -> { open_connections.count == 2 && @game.state != "finished" }
+  after_unsubscribe :clear_player, if: -> { @game.present? && @game.state != "finished" }
+  after_unsubscribe :cleanup_game, if: -> { open_connections.empty? && @game.state != "finished" }
 
   # CHANNEL CALLBACKS
   def connect
@@ -13,13 +14,8 @@ class GamesChannel < ApplicationCable::Channel
     begin
       game_id = params[:game_id]
       @game = Game.find(game_id)
-      game_player = @game.game_players.find_by(player: current_player)
-      game_player.update(connected: true) if game_player.present?
-      current_player.update(status: "playing") if current_player.present?
 
-      stream_for @game
-    rescue ActiveRecord::RecordNotFound
-      reject
+      stream_or_reject_for(@game)
     end
   end
 
@@ -27,18 +23,22 @@ class GamesChannel < ApplicationCable::Channel
     puts "Received data: #{data.inspect}"
   end
 
-  def init_game
-    # this ensures the two players are in the game channel
-    connected_game_players = @game.game_players.select { |gp| gp.connected }
-
-    if connected_game_players.count == 2
-      @game.game_players.each do |game_player|
-        game_player.player.update(status: "playing")
-      end
-      @game.update(state: "playing")
+  def init_player
+    if game_player.present?
+      game_player.update(connected: true)
+      game_player.player.update(status: "playing")
     end
+  end
 
-    @game.reload
+  def clear_player
+    if game_player.present?
+      game_player.update(connected: false)
+      game_player.player.update(status: "inactive")
+    end
+  end
+
+  def init_game
+    @game.update(state: "playing")
 
     if params[:get_images]
       broadcast_game({ images_array: true })
@@ -48,19 +48,8 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def cleanup_game
-    current_game_player = @game.game_players.select { |gp| gp.player.guest_id == connection.guest_id }.first
-    current_game_player.update(connected: false) if current_game_player.present?
-    current_game_player.player.update(status: "inactive") if current_game_player.present?
-    broadcast_game
-
-    if @game.game_players.all? { |gp| !gp.connected } && @game.state != "finished"
-      puts "All players disconnected, cleaning up game."
-      @game.destroy
-    else
-      puts "Not all players disconnected, game will remain active."
-    end
+    @game.destroy
   rescue StandardError => e
-    puts "Error during cleanup: #{e.message}"
     # Handle any cleanup errors gracefully
     @game.update(state: "error") if @game.present?
   end
@@ -73,7 +62,6 @@ class GamesChannel < ApplicationCable::Channel
   # GAME ACTIONS
   def flip_card(data)
     if !@game.can_flip?(current_player)
-      puts "Player #{current_player.guest_id} cannot flip a card."
       return
     end
 
@@ -83,8 +71,6 @@ class GamesChannel < ApplicationCable::Channel
       flipped_by: current_player.guest_id
     )
 
-    puts "======= game_card flipped by player #{current_player.guest_id} ======="
-    puts game_card.inspect
     broadcast_game
 
     # game progresses / validation of action, then broadcast the game state
@@ -94,11 +80,36 @@ class GamesChannel < ApplicationCable::Channel
 
   def concede(data)
     @game.concede(current_player)
+    @game.game_players.each do |game_player|
+      game_player.player.update(status: "inactive")
+    end
 
     broadcast_game
   end
 
   private
+
+  def open_connections
+    all_game_connections.select do |conn|
+      state = conn.instance_values["websocket"].instance_values["websocket"].instance_variable_get(:@driver).state
+      state == :open
+    end.map { |conn| conn.guest_id }
+  end
+
+  def all_game_connections
+    # This method returns all connections for the current game
+    # identifiers: ["{\"channel\":\"GamesChannel\",\"id\":\"1752164909411\",\"game_id\":\"531\",\"get_images\":false}"]
+    ActionCable.server.connections.select do |conn|
+      conn.subscriptions.identifiers.any? do |identifier|
+        begin
+          data = JSON.parse(identifier)
+          data["game_id"].to_i == @game.id
+        rescue JSON::ParserError
+          false
+        end
+      end
+    end
+  end
 
   def broadcast_game(opts = {})
     @game.reload
@@ -108,8 +119,12 @@ class GamesChannel < ApplicationCable::Channel
     )
   end
 
+  def game_player
+    @game.game_players.find { |gp| gp.guest_id == connection.guest_id }
+  end
+
   def current_player
-    Player.find_by(guest_id: connection.guest_id)
+    connection.player
   end
 
   def opponent_player
