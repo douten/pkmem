@@ -20,9 +20,17 @@ module CardsConstant
         # Normalize the name for matching (remove " ex", case insensitive)
         normalized_name = card[:label][:eng].downcase.gsub(/ ex$/, "")
         tcg_by_name[normalized_name] ||= []
-        # Format: A1_002_EN.webp using set and padded card number
+        # Format: A1a_002_EN.png using modified set case and padded card number
         card_number = card[:number].to_s.rjust(3, "0")
-        tcg_by_name[normalized_name] << "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/#{card[:set]}/#{card[:set]}_#{card_number}_EN.webp"
+
+        # Convert set like "A1A" to "A1a" (make only the last letter lowercase)
+        if card[:set].length > 2
+          set_case = card[:set][0..-2] + card[:set][-1].downcase
+        else
+          set_case = card[:set]
+        end
+
+        tcg_by_name[normalized_name] << "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/#{set_case}/#{set_case}_#{card_number}_EN.png"
       end
 
       # Generate final array
