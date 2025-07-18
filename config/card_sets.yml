@@ -1,259 +1,388 @@
 card_families:
+  # Bulbasaur → Ivysaur → Venusaur
   - name: "Bulbasaur Family"
     evolutions: [[1, 2, 3]]
+  # Charmander → Charmeleon → Charizard
   - name: "Charmander Family" 
     evolutions: [[4, 5, 6]]
+  # Squirtle → Wartortle → Blastoise
   - name: "Squirtle Family"
     evolutions: [[7, 8, 9]]
+  # Caterpie → Metapod → Butterfree
   - name: "Caterpie Family"
     evolutions: [[10, 11, 12]]
+  # Weedle → Kakuna → Beedrill
   - name: "Weedle Family"
     evolutions: [[13, 14, 15]]
+  # Pidgey → Pidgeotto → Pidgeot
   - name: "Pidgey Family"
     evolutions: [[16, 17, 18]]
+  # Rattata → Raticate
   - name: "Rattata Family"
     evolutions: [[19, 20]]
+  # Spearow → Fearow
   - name: "Spearow Family"
     evolutions: [[21, 22]]
+  # Ekans → Arbok
   - name: "Ekans Family"
     evolutions: [[23, 24]]
+  # Pichu → Pikachu → Raichu
   - name: "Pichu/Pikachu Family"
     evolutions: [[172, 25, 26]]
+  # Sandshrew → Sandslash
   - name: "Sandshrew Family"
     evolutions: [[27, 28]]
+  # Nidoran♀ → Nidorina → Nidoqueen
   - name: "Nidoran♀ Family"
     evolutions: [[29, 30, 31]]
+  # Nidoran♂ → Nidorino → Nidoking
   - name: "Nidoran♂ Family"
     evolutions: [[32, 33, 34]]
+  # Cleffa → Clefairy → Clefable
   - name: "Cleffa/Clefairy Family"
     evolutions: [[173, 35, 36]]
+  # Vulpix → Ninetales
   - name: "Vulpix Family"
     evolutions: [[37, 38]]
+  # Igglybuff → Jigglypuff → Wigglytuff
   - name: "Igglybuff/Jigglypuff Family"
     evolutions: [[174, 39, 40]]
+  # Zubat → Golbat → Crobat
   - name: "Zubat Family"
     evolutions: [[41, 42, 169]]
+  # Oddish → Gloom → Vileplume / Oddish → Gloom → Bellossom
   - name: "Oddish Family"
     evolutions: [[43, 44, 45], [43, 44, 182]]
+  # Paras → Parasect
   - name: "Paras Family"
     evolutions: [[46, 47]]
+  # Venonat → Venomoth
   - name: "Venonat Family"
     evolutions: [[48, 49]]
+  # Diglett → Dugtrio
   - name: "Diglett Family"
     evolutions: [[50, 51]]
+  # Meowth → Persian
   - name: "Meowth Family"
     evolutions: [[52, 53]]
+  # Psyduck → Golduck
   - name: "Psyduck Family"
     evolutions: [[54, 55]]
+  # Mankey → Primeape
   - name: "Mankey Family"
     evolutions: [[56, 57]]
+  # Growlithe → Arcanine
   - name: "Growlithe Family"
     evolutions: [[58, 59]]
+  # Poliwag → Poliwhirl → Poliwrath / Poliwag → Poliwhirl → Politoed
   - name: "Poliwag Family"
     evolutions: [[60, 61, 62], [60, 61, 186]]
+  # Abra → Kadabra → Alakazam
   - name: "Abra Family"
     evolutions: [[63, 64, 65]]
+  # Machop → Machoke → Machamp
   - name: "Machop Family"
     evolutions: [[66, 67, 68]]
+  # Bellsprout → Weepinbell → Victreebel
   - name: "Bellsprout Family"
     evolutions: [[69, 70, 71]]
+  # Tentacool → Tentacruel
   - name: "Tentacool Family"
     evolutions: [[72, 73]]
+  # Geodude → Graveler → Golem
   - name: "Geodude Family"
     evolutions: [[74, 75, 76]]
+  # Ponyta → Rapidash
   - name: "Ponyta Family"
     evolutions: [[77, 78]]
+  # Slowpoke → Slowbro / Slowpoke → Slowking
   - name: "Slowpoke Family"
     evolutions: [[79, 80], [79, 199]]
+  # Magnemite → Magneton
   - name: "Magnemite Family"
     evolutions: [[81, 82]]
+  # Farfetch'd (no evolution)
   - name: "Farfetch'd"
     evolutions: [[83]]
+  # Doduo → Dodrio
   - name: "Doduo Family"
     evolutions: [[84, 85]]
+  # Seel → Dewgong
   - name: "Seel Family"
     evolutions: [[86, 87]]
+  # Grimer → Muk
   - name: "Grimer Family"
     evolutions: [[88, 89]]
+  # Shellder → Cloyster
   - name: "Shellder Family"
     evolutions: [[90, 91]]
+  # Gastly → Haunter → Gengar
   - name: "Gastly Family"
     evolutions: [[92, 93, 94]]
+  # Onix → Steelix
   - name: "Onix Family"
     evolutions: [[95, 208]]
+  # Drowzee → Hypno
   - name: "Drowzee Family"
     evolutions: [[96, 97]]
+  # Krabby → Kingler
   - name: "Krabby Family"
     evolutions: [[98, 99]]
+  # Voltorb → Electrode
   - name: "Voltorb Family"
     evolutions: [[100, 101]]
+  # Exeggcute → Exeggutor
   - name: "Exeggcute Family"
     evolutions: [[102, 103]]
+  # Cubone → Marowak
   - name: "Cubone Family"
     evolutions: [[104, 105]]
+  # Tyrogue → Hitmonlee / Tyrogue → Hitmonchan / Tyrogue → Hitmontop
   - name: "Tyrogue/Hitmon Family"
     evolutions: [[236, 106], [236, 107], [236, 237]]
+  # Lickitung (no evolution)
   - name: "Lickitung"
     evolutions: [[108]]
+  # Koffing → Weezing
   - name: "Koffing Family"
     evolutions: [[109, 110]]
+  # Rhyhorn → Rhydon
   - name: "Rhyhorn Family"
     evolutions: [[111, 112]]
+  # Chansey → Blissey
   - name: "Chansey Family"
     evolutions: [[113, 242]]
+  # Tangela (no evolution)
   - name: "Tangela"
     evolutions: [[114]]
+  # Kangaskhan (no evolution)
   - name: "Kangaskhan"
     evolutions: [[115]]
+  # Horsea → Seadra → Kingdra
   - name: "Horsea Family"
     evolutions: [[116, 117, 230]]
+  # Goldeen → Seaking
   - name: "Goldeen Family"
     evolutions: [[118, 119]]
+  # Staryu → Starmie
   - name: "Staryu Family"
     evolutions: [[120, 121]]
+  # Mr. Mime (no evolution)
   - name: "Mr. Mime"
     evolutions: [[122]]
+  # Scyther → Scizor
   - name: "Scyther Family"
     evolutions: [[123, 212]]
+  # Smoochum → Jynx
   - name: "Smoochum/Jynx Family"
     evolutions: [[238, 124]]
+  # Elekid → Electabuzz
   - name: "Elekid/Electabuzz Family"
     evolutions: [[239, 125]]
+  # Magby → Magmar
   - name: "Magby/Magmar Family"
     evolutions: [[240, 126]]
+  # Pinsir (no evolution)
   - name: "Pinsir"
     evolutions: [[127]]
+  # Tauros (no evolution)
   - name: "Tauros"
     evolutions: [[128]]
+  # Magikarp → Gyarados
   - name: "Magikarp Family"
     evolutions: [[129, 130]]
+  # Lapras (no evolution)
   - name: "Lapras"
     evolutions: [[131]]
+  # Ditto (no evolution)
   - name: "Ditto"
     evolutions: [[132]]
+  # Eevee → Vaporeon / Eevee → Jolteon / Eevee → Flareon / Eevee → Espeon / Eevee → Umbreon
   - name: "Eevee Family"
     evolutions: [[133, 134], [133, 135], [133, 136], [133, 196], [133, 197]]
+  # Porygon → Porygon2
   - name: "Porygon Family"
     evolutions: [[137, 233]]
+  # Omanyte → Omastar
   - name: "Omanyte Family"
     evolutions: [[138, 139]]
+  # Kabuto → Kabutops
   - name: "Kabuto Family"
     evolutions: [[140, 141]]
+  # Aerodactyl (no evolution)
   - name: "Aerodactyl"
     evolutions: [[142]]
+  # Snorlax (no evolution)
   - name: "Snorlax"
     evolutions: [[143]]
+  # Articuno (no evolution)
   - name: "Articuno"
     evolutions: [[144]]
+  # Zapdos (no evolution)
   - name: "Zapdos"
     evolutions: [[145]]
+  # Moltres (no evolution)
   - name: "Moltres"
     evolutions: [[146]]
+  # Dratini → Dragonair → Dragonite
   - name: "Dratini Family"
     evolutions: [[147, 148, 149]]
+  # Mewtwo (no evolution)
   - name: "Mewtwo"
     evolutions: [[150]]
+  # Mew (no evolution)
   - name: "Mew"
     evolutions: [[151]]
+  # Chikorita → Bayleef → Meganium
   - name: "Chikorita Family"
     evolutions: [[152, 153, 154]]
+  # Cyndaquil → Quilava → Typhlosion
   - name: "Cyndaquil Family"
     evolutions: [[155, 156, 157]]
+  # Totodile → Croconaw → Feraligatr
   - name: "Totodile Family"
     evolutions: [[158, 159, 160]]
+  # Sentret → Furret
   - name: "Sentret Family"
     evolutions: [[161, 162]]
+  # Hoothoot → Noctowl
   - name: "Hoothoot Family"
     evolutions: [[163, 164]]
+  # Ledyba → Ledian
   - name: "Ledyba Family"
     evolutions: [[165, 166]]
+  # Spinarak → Ariados
   - name: "Spinarak Family"
     evolutions: [[167, 168]]
+  # Chinchou → Lanturn
   - name: "Chinchou Family"
     evolutions: [[170, 171]]
+  # Togepi → Togetic
   - name: "Togepi Family"
     evolutions: [[175, 176]]
+  # Natu → Xatu
   - name: "Natu Family"
     evolutions: [[177, 178]]
+  # Mareep → Flaaffy → Ampharos
   - name: "Mareep Family"
     evolutions: [[179, 180, 181]]
+  # Azurill → Marill → Azumarill
   - name: "Azurill/Marill Family"
     evolutions: [[182, 183, 184]]
+  # Sudowoodo (no evolution)
   - name: "Sudowoodo"
     evolutions: [[185]]
+  # Hoppip → Skiploom → Jumpluff
   - name: "Hoppip Family"
     evolutions: [[187, 188, 189]]
+  # Aipom (no evolution)
   - name: "Aipom"
     evolutions: [[190]]
+  # Sunkern → Sunflora
   - name: "Sunkern Family"
     evolutions: [[191, 192]]
+  # Yanma (no evolution)
   - name: "Yanma"
     evolutions: [[193]]
+  # Wooper → Quagsire
   - name: "Wooper Family"
     evolutions: [[194, 195]]
+  # Murkrow (no evolution)
   - name: "Murkrow"
     evolutions: [[198]]
+  # Misdreavus (no evolution)
   - name: "Misdreavus"
     evolutions: [[200]]
+  # Unown (no evolution)
   - name: "Unown"
     evolutions: [[201]]
+  # Wobbuffet (no evolution)
   - name: "Wobbuffet"
     evolutions: [[202]]
+  # Girafarig (no evolution)
   - name: "Girafarig"
     evolutions: [[203]]
+  # Pineco → Forretress
   - name: "Pineco Family"
     evolutions: [[204, 205]]
+  # Dunsparce (no evolution)
   - name: "Dunsparce"
     evolutions: [[206]]
+  # Gligar (no evolution)
   - name: "Gligar"
     evolutions: [[207]]
+  # Snubbull → Granbull
   - name: "Snubbull Family"
     evolutions: [[209, 210]]
+  # Qwilfish (no evolution)
   - name: "Qwilfish"
     evolutions: [[211]]
+  # Shuckle (no evolution)
   - name: "Shuckle"
     evolutions: [[213]]
+  # Heracross (no evolution)
   - name: "Heracross"
     evolutions: [[214]]
+  # Sneasel (no evolution)
   - name: "Sneasel"
     evolutions: [[215]]
+  # Teddiursa → Ursaring
   - name: "Teddiursa Family"
     evolutions: [[216, 217]]
+  # Slugma → Magcargo
   - name: "Slugma Family"
     evolutions: [[218, 219]]
+  # Swinub → Piloswine
   - name: "Swinub Family"
     evolutions: [[220, 221]]
+  # Corsola (no evolution)
   - name: "Corsola"
     evolutions: [[222]]
+  # Remoraid → Octillery
   - name: "Remoraid Family"
     evolutions: [[223, 224]]
+  # Delibird (no evolution)
   - name: "Delibird"
     evolutions: [[225]]
+  # Mantine (no evolution)
   - name: "Mantine"
     evolutions: [[226]]
+  # Skarmory (no evolution)
   - name: "Skarmory"
     evolutions: [[227]]
+  # Houndour → Houndoom
   - name: "Houndour Family"
     evolutions: [[228, 229]]
+  # Phanpy → Donphan
   - name: "Phanpy Family"
     evolutions: [[231, 232]]
+  # Stantler (no evolution)
   - name: "Stantler"
     evolutions: [[234]]
+  # Smeargle (no evolution)
   - name: "Smeargle"
     evolutions: [[235]]
+  # Miltank (no evolution)
   - name: "Miltank"
     evolutions: [[241]]
+  # Raikou (no evolution)
   - name: "Raikou"
     evolutions: [[243]]
+  # Entei (no evolution)
   - name: "Entei"
     evolutions: [[244]]
+  # Suicune (no evolution)
   - name: "Suicune"
     evolutions: [[245]]
+  # Larvitar → Pupitar → Tyranitar
   - name: "Larvitar Family"
     evolutions: [[246, 247, 248]]
+  # Lugia (no evolution)
   - name: "Lugia"
     evolutions: [[249]]
+  # Ho-oh (no evolution)
   - name: "Ho-oh"
     evolutions: [[250]]
+  # Celebi (no evolution)
   - name: "Celebi"
     evolutions: [[251]]
