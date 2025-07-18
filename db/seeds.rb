@@ -8,18 +8,21 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-# Load card sets configuration from YAML file
+# Load card families configuration from YAML file
 config = YAML.load_file(Rails.root.join('config', 'card_sets.yml'))
 
-config['card_sets'].each_with_index do |set_config, index|
+config['card_families'].each_with_index do |family_config, index|
   card_set = CardSet.find_or_create_by!(number: index + 1) do |cs|
-    cs.name = set_config['name']
+    cs.name = family_config['name']
   end
 
   # Update name if it changed
-  card_set.update!(name: set_config['name']) if card_set.name != set_config['name']
+  card_set.update!(name: family_config['name']) if card_set.name != family_config['name']
 
-  set_config['cards'].each do |card_number|
+  # Process evolution chains - flatten all cards from all evolution paths
+  all_cards = family_config['evolutions'].flatten.uniq
+  
+  all_cards.each do |card_number|
     # Create card if it doesn't already exist
     card = Card.find_or_create_by!(number: card_number)
     card_set.cards << card unless card_set.cards.include?(card)
