@@ -1,0 +1,301 @@
+card_sets:
+  - name: "Bulbasaur Evolution"
+    cards: [1, 2, 3]
+  - name: "Charmander Evolution"
+    cards: [4, 5, 6]
+  - name: "Squirtle Evolution"
+    cards: [7, 8, 9]
+  - name: "Caterpie Evolution"
+    cards: [10, 11, 12]
+  - name: "Weedle Evolution"
+    cards: [13, 14, 15]
+  - name: "Pidgey Evolution"
+    cards: [16, 17, 18]
+  - name: "Rattata Evolution"
+    cards: [19, 20]
+  - name: "Spearow Evolution"
+    cards: [21, 22]
+  - name: "Ekans Evolution"
+    cards: [23, 24]
+  - name: "Pikachu Evolution"
+    cards: [25, 26]
+  - name: "Sandshrew Evolution"
+    cards: [27, 28]
+  - name: "Nidoran♀ Evolution"
+    cards: [29, 30, 31]
+  - name: "Nidoran♂ Evolution"
+    cards: [32, 33, 34]
+  - name: "Clefairy Evolution"
+    cards: [35, 36]
+  - name: "Vulpix Evolution"
+    cards: [37, 38]
+  - name: "Jigglypuff Evolution"
+    cards: [39, 40]
+  - name: "Zubat Evolution"
+    cards: [41, 42]
+  - name: "Oddish Evolution"
+    cards: [43, 44, 45]
+  - name: "Paras Evolution"
+    cards: [46, 47]
+  - name: "Venonat Evolution"
+    cards: [48, 49]
+  - name: "Diglett Evolution"
+    cards: [50, 51]
+  - name: "Meowth Evolution"
+    cards: [52, 53]
+  - name: "Psyduck Evolution"
+    cards: [54, 55]
+  - name: "Mankey Evolution"
+    cards: [56, 57]
+  - name: "Growlithe Evolution"
+    cards: [58, 59]
+  - name: "Poliwag Evolution"
+    cards: [60, 61, 62]
+  - name: "Abra Evolution"
+    cards: [63, 64, 65]
+  - name: "Machop Evolution"
+    cards: [66, 67, 68]
+  - name: "Bellsprout Evolution"
+    cards: [69, 70, 71]
+  - name: "Tentacool Evolution"
+    cards: [72, 73]
+  - name: "Geodude Evolution"
+    cards: [74, 75, 76]
+  - name: "Ponyta Evolution"
+    cards: [77, 78]
+  - name: "Slowpoke Evolution"
+    cards: [79, 80]
+  - name: "Magnemite Evolution"
+    cards: [81, 82]
+  - name: "Farfetch'd"
+    cards: [83]
+  - name: "Doduo Evolution"
+    cards: [84, 85]
+  - name: "Seel Evolution"
+    cards: [86, 87]
+  - name: "Grimer Evolution"
+    cards: [88, 89]
+  - name: "Shellder Evolution"
+    cards: [90, 91]
+  - name: "Gastly Evolution"
+    cards: [92, 93, 94]
+  - name: "Onix"
+    cards: [95]
+  - name: "Drowzee Evolution"
+    cards: [96, 97]
+  - name: "Krabby Evolution"
+    cards: [98, 99]
+  - name: "Voltorb Evolution"
+    cards: [100, 101]
+  - name: "Exeggcute Evolution"
+    cards: [102, 103]
+  - name: "Cubone Evolution"
+    cards: [104, 105]
+  - name: "Hitmonlee"
+    cards: [106]
+  - name: "Hitmonchan"
+    cards: [107]
+  - name: "Lickitung"
+    cards: [108]
+  - name: "Koffing Evolution"
+    cards: [109, 110]
+  - name: "Rhyhorn Evolution"
+    cards: [111, 112]
+  - name: "Chansey"
+    cards: [113]
+  - name: "Tangela"
+    cards: [114]
+  - name: "Kangaskhan"
+    cards: [115]
+  - name: "Horsea Evolution"
+    cards: [116, 117]
+  - name: "Goldeen Evolution"
+    cards: [118, 119]
+  - name: "Staryu Evolution"
+    cards: [120, 121]
+  - name: "Mr. Mime"
+    cards: [122]
+  - name: "Scyther"
+    cards: [123]
+  - name: "Jynx"
+    cards: [124]
+  - name: "Electabuzz"
+    cards: [125]
+  - name: "Magmar"
+    cards: [126]
+  - name: "Pinsir"
+    cards: [127]
+  - name: "Tauros"
+    cards: [128]
+  - name: "Magikarp Evolution"
+    cards: [129, 130]
+  - name: "Lapras"
+    cards: [131]
+  - name: "Ditto"
+    cards: [132]
+  - name: "Eevee → Vaporeon"
+    cards: [133, 134]
+  - name: "Eevee → Jolteon"
+    cards: [133, 135]
+  - name: "Eevee → Flareon"
+    cards: [133, 136]
+  - name: "Porygon"
+    cards: [137]
+  - name: "Omanyte Evolution"
+    cards: [138, 139]
+  - name: "Kabuto Evolution"
+    cards: [140, 141]
+  - name: "Aerodactyl"
+    cards: [142]
+  - name: "Snorlax"
+    cards: [143]
+  - name: "Articuno"
+    cards: [144]
+  - name: "Zapdos"
+    cards: [145]
+  - name: "Moltres"
+    cards: [146]
+  - name: "Dratini Evolution"
+    cards: [147, 148, 149]
+  - name: "Mewtwo"
+    cards: [150]
+  - name: "Mew"
+    cards: [151]
+  - name: "Chikorita Evolution"
+    cards: [152, 153, 154]
+  - name: "Cyndaquil Evolution"
+    cards: [155, 156, 157]
+  - name: "Totodile Evolution"
+    cards: [158, 159, 160]
+  - name: "Sentret Evolution"
+    cards: [161, 162]
+  - name: "Hoothoot Evolution"
+    cards: [163, 164]
+  - name: "Ledyba Evolution"
+    cards: [165, 166]
+  - name: "Spinarak Evolution"
+    cards: [167, 168]
+  - name: "Crobat"
+    cards: [169]
+  - name: "Chinchou Evolution"
+    cards: [170, 171]
+  - name: "Pichu"
+    cards: [172]
+  - name: "Cleffa"
+    cards: [173]
+  - name: "Igglybuff"
+    cards: [174]
+  - name: "Togepi Evolution"
+    cards: [175, 176]
+  - name: "Natu Evolution"
+    cards: [177, 178]
+  - name: "Mareep Evolution"
+    cards: [179, 180, 181]
+  - name: "Bellossom"
+    cards: [182]
+  - name: "Marill Evolution"
+    cards: [183, 184]
+  - name: "Sudowoodo"
+    cards: [185]
+  - name: "Politoed"
+    cards: [186]
+  - name: "Hoppip Evolution"
+    cards: [187, 188, 189]
+  - name: "Aipom"
+    cards: [190]
+  - name: "Sunkern Evolution"
+    cards: [191, 192]
+  - name: "Yanma"
+    cards: [193]
+  - name: "Wooper Evolution"
+    cards: [194, 195]
+  - name: "Espeon"
+    cards: [196]
+  - name: "Umbreon"
+    cards: [197]
+  - name: "Murkrow"
+    cards: [198]
+  - name: "Slowking"
+    cards: [199]
+  - name: "Misdreavus"
+    cards: [200]
+  - name: "Unown"
+    cards: [201]
+  - name: "Wobbuffet"
+    cards: [202]
+  - name: "Girafarig"
+    cards: [203]
+  - name: "Pineco Evolution"
+    cards: [204, 205]
+  - name: "Dunsparce"
+    cards: [206]
+  - name: "Gligar"
+    cards: [207]
+  - name: "Steelix"
+    cards: [208]
+  - name: "Snubbull Evolution"
+    cards: [209, 210]
+  - name: "Qwilfish"
+    cards: [211]
+  - name: "Scizor"
+    cards: [212]
+  - name: "Shuckle"
+    cards: [213]
+  - name: "Heracross"
+    cards: [214]
+  - name: "Sneasel"
+    cards: [215]
+  - name: "Teddiursa Evolution"
+    cards: [216, 217]
+  - name: "Slugma Evolution"
+    cards: [218, 219]
+  - name: "Swinub Evolution"
+    cards: [220, 221]
+  - name: "Corsola"
+    cards: [222]
+  - name: "Remoraid Evolution"
+    cards: [223, 224]
+  - name: "Delibird"
+    cards: [225]
+  - name: "Mantine"
+    cards: [226]
+  - name: "Skarmory"
+    cards: [227]
+  - name: "Houndour Evolution"
+    cards: [228, 229]
+  - name: "Kingdra"
+    cards: [230]
+  - name: "Phanpy Evolution"
+    cards: [231, 232]
+  - name: "Porygon2"
+    cards: [233]
+  - name: "Stantler"
+    cards: [234]
+  - name: "Smeargle"
+    cards: [235]
+  - name: "Tyrogue Evolution"
+    cards: [236, 237]
+  - name: "Smoochum"
+    cards: [238]
+  - name: "Elekid"
+    cards: [239]
+  - name: "Magby"
+    cards: [240]
+  - name: "Miltank"
+    cards: [241]
+  - name: "Blissey"
+    cards: [242]
+  - name: "Raikou"
+    cards: [243]
+  - name: "Entei"
+    cards: [244]
+  - name: "Suicune"
+    cards: [245]
+  - name: "Larvitar Evolution"
+    cards: [246, 247, 248]
+  - name: "Lugia"
+    cards: [249]
+  - name: "Ho-oh"
+    cards: [250]
+  - name: "Celebi"
+    cards: [251]
