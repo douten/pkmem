@@ -25,7 +25,7 @@ class Game < ApplicationRecord
     end
 
     if opts[:images_array]
-      game_stream[:images_array] = self.cards.map(&:image_url)
+      game_stream[:images_array] = self.cards.map { |card| card.image_url(self.id) }
     end
 
     game_stream

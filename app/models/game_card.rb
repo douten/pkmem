@@ -23,7 +23,7 @@ class GameCard < ApplicationRecord
 
   def image_url
     if self.face_up?
-      self.card.image_url
+      self.card.image_url(self.game_id)
     else
       nil
     end
