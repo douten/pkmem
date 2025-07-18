@@ -139,6 +139,10 @@ card_sets:
     cards: [133, 135]
   - name: "Eevee → Flareon"
     cards: [133, 136]
+  - name: "Eevee → Espeon"
+    cards: [133, 196]
+  - name: "Eevee → Umbreon"
+    cards: [133, 197]
   - name: "Porygon"
     cards: [137]
   - name: "Omanyte Evolution"
@@ -209,10 +213,6 @@ card_sets:
     cards: [193]
   - name: "Wooper Evolution"
     cards: [194, 195]
-  - name: "Espeon"
-    cards: [196]
-  - name: "Umbreon"
-    cards: [197]
   - name: "Murkrow"
     cards: [198]
   - name: "Slowking"
