@@ -7,7 +7,13 @@ class Card < ApplicationRecord
   has_many :card_sets, through: :card_set_cards
 
   def image_url
-    CardsConstant.images.find { |p| p[:id] == self.number.to_s }
-      &.dig(:url) || nil
+    pokemon_data = CardsConstant.images.find { |p| p[:id] == self.number.to_s }
+    return nil unless pokemon_data
+
+    urls = pokemon_data[:url]
+    return nil if urls.nil? || urls.empty?
+
+    # Return a random URL from the array
+    urls.sample
   end
 end
