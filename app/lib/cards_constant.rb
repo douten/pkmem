@@ -17,8 +17,8 @@ module CardsConstant
       # Create a hash to group TCG cards by Pokemon name
       tcg_by_name = {}
       tcg_data.each do |card|
-        # Normalize the name for matching (remove " ex", case insensitive)
-        normalized_name = card[:label][:eng].downcase.gsub(/ ex$/, "")
+        # Normalize the name for matching (remove " ex", case insensitive, normalize apostrophes)
+        normalized_name = card[:label][:eng].downcase.gsub(/ ex$/, "").gsub(/['’']/, "'")
         tcg_by_name[normalized_name] ||= []
         # Format: A1a_002_EN.png using modified set case and padded card number
         card_number = card[:number].to_s.rjust(3, "0")
@@ -42,7 +42,7 @@ module CardsConstant
       # Generate final array
       result = []
       pokemon_data.each do |pokemon|
-        pokemon_name = pokemon[:name][:english].downcase
+        pokemon_name = pokemon[:name][:english].downcase.gsub(/['']/, "'")
 
         if tcg_by_name[pokemon_name]
           result << {
