@@ -141,7 +141,7 @@ class Game < ApplicationRecord
         used_card_sets.concat(unpositioned_card.card.card_sets)
       end
 
-      self.update({ turn: opponent_player.guest_id })
+      self.update({ turn: player.guest_id })
     end
 
     player_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == player.guest_id }.length
