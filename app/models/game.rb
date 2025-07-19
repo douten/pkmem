@@ -11,7 +11,7 @@ class Game < ApplicationRecord
   before_save :cleanup_game, if: :will_save_change_to_state?
 
   # validates that cards exist when there's two players
-  validates :cards, length: { is: TOTAL_CARDS_ON_BOARD }, if: :enough_players?
+  validates :cards, length: { is: 40 }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
 
   def stream(opts = {})
@@ -111,17 +111,40 @@ class Game < ApplicationRecord
     elsif all_matching_cards
       # If all flipped cards match, we score the cards
       puts "Cards matched by player #{player.guest_id}."
+
+      # store the card positions in an array so we can add in new cards later
+      scored_card_positions = player_flipped_game_cards.map(&:position)
+
       player_flipped_game_cards.each do |game_card|
-        game_card.update({ scored_by: player.guest_id })
+        game_card.update({ scored_by: player.guest_id, position: 0 })
       end
+
+      # This loop finds unpositioned game cards and assigns them new positions
+      # It ensures that no two game cards from the same set are positioned together
+      used_card_sets = []
+
+      scored_card_positions.each do |position|
+        # Find an unpositioned card that doesn't belong to an already used card set
+        unpositioned_card = self.game_cards.find do |gc|
+          gc.scored_by.nil? && gc.position.zero? &&
+          !used_card_sets.any? { |used_set| gc.card.card_sets.include?(used_set) }
+        end
+
+        break if unpositioned_card.nil?
+
+        # Update the card's position and track its card sets
+        unpositioned_card.update({ position: position })
+        used_card_sets.concat(unpositioned_card.card.card_sets)
+      end
+
       self.update({ turn: opponent_player.guest_id })
     end
 
-    # This logic determines if the game is finished
-    if all_game_cards_flipped?
-      player_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == player.guest_id }.length
-      opponent_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == opponent_player.guest_id }.length
+    player_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == player.guest_id }.length
+    opponent_scored_game_cards = self.game_cards.select { |gc| gc.scored_by == opponent_player.guest_id }.length
 
+    # This logic determines if the game is finished
+    if player_scored_game_cards >= 15 || opponent_scored_game_cards >= 15
       self.game_players.each do |game_player|
         if game_player.player.guest_id == player.guest_id
           score = player_scored_game_cards
@@ -185,11 +208,13 @@ class Game < ApplicationRecord
   end
 
   def stream_cards
-    self.game_cards.sort_by(&:position).map do |game_card|
+    self.game_cards.filter { |gc| gc.position && gc.position > 0 }.sort_by(&:position).map do |game_card|
       {
         id: game_card.id,
-        flipped: game_card.face_up,
-        image_url: game_card.face_up? ? game_card.image_url : nil
+        flipped: true,
+                # image_url: game_card.face_up? ? game_card.image_url : nil
+                image_url: game_card.image_url
+
       }
     end
   end
@@ -208,7 +233,7 @@ class Game < ApplicationRecord
 
   # MODEL ACTIONS
   def set_cards
-    total_cards = TOTAL_CARDS_ON_BOARD
+    total_cards = 40
 
     CardSet.all.shuffle.each do |set|
       number_of_cards_to_add = set.cards.length < 2 ? 2 : set.cards.length
@@ -217,9 +242,9 @@ class Game < ApplicationRecord
       # If adding this set's cards would exceed the total, skip to the next set
       next if cards_will_exceed_total
 
-      # If adding this set's cards would leave us with one card short of the total, skip to the next set
-      # This will ensure sets with one card will create pairs
-      next if self.cards.length + number_of_cards_to_add == total_cards - 1
+      # # If adding this set's cards would leave us with one card short of the total, skip to the next set
+      # # This will ensure sets with one card will create pairs
+      # next if self.cards.length + number_of_cards_to_add == total_cards - 1
 
       # If we already have enough cards, skip to the break
       break if self.cards.length >= total_cards
@@ -231,8 +256,11 @@ class Game < ApplicationRecord
       end
     end
 
-    self.game_cards.shuffle.each_with_index do |game_card, index|
-      game_card.position = index
+    # variable for up to 16 cards that matches to put on the board initially
+    first_board_game_card_set = self.game_cards.take(TOTAL_CARDS_ON_BOARD)
+
+    first_board_game_card_set.shuffle.each_with_index do |game_card, index|
+      game_card.position = index + 1
       game_card.save
     end
   end
