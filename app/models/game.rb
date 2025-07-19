@@ -211,10 +211,8 @@ class Game < ApplicationRecord
     self.game_cards.filter { |gc| gc.position && gc.position > 0 }.sort_by(&:position).map do |game_card|
       {
         id: game_card.id,
-        flipped: true,
-                # image_url: game_card.face_up? ? game_card.image_url : nil
-                image_url: game_card.image_url
-
+        flipped: game_card.face_up?,
+        image_url: game_card.face_up? ? game_card.image_url : nil
       }
     end
   end
