@@ -74,8 +74,8 @@ class GamesChannel < ApplicationCable::Channel
     broadcast_game
 
     # game progresses / validation of action, then broadcast the game state
-    delay_update = @game.progress_game(current_player)
-    broadcast_game({ delay: delay_update ? 1000 : 0 })
+    matched_cards, delay_update = @game.progress_game(current_player)
+    broadcast_game({ delay: delay_update ? 1000 : 0, matched_cards: matched_cards })
   end
 
   def concede(data)

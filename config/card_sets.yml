@@ -28,7 +28,8 @@ card_families:
     evolutions: [[23, 24]]
   # Pichu → Pikachu → Raichu
   - name: "Pichu/Pikachu Family"
-    evolutions: [[172, 25, 26]]
+    # evolutions: [[172, 25, 26]]
+    evolutions: [[25, 26]] # Pichu (172, not out yet)
   # Sandshrew → Sandslash
   - name: "Sandshrew Family"
     evolutions: [[27, 28]]
@@ -40,13 +41,15 @@ card_families:
     evolutions: [[32, 33, 34]]
   # Cleffa → Clefairy → Clefable
   - name: "Cleffa/Clefairy Family"
-    evolutions: [[173, 35, 36]]
+    # evolutions: [[173, 35, 36]]
+    evolutions: [[35, 36]] # Cleffa (173, not out yet)
   # Vulpix → Ninetales
   - name: "Vulpix Family"
     evolutions: [[37, 38]]
   # Igglybuff → Jigglypuff → Wigglytuff
   - name: "Igglybuff/Jigglypuff Family"
-    evolutions: [[174, 39, 40]]
+    # evolutions: [[174, 39, 40]]
+    evolutions: [[39, 40]] # Igglybuff (174, not out yet)
   # Zubat → Golbat → Crobat
   - name: "Zubat Family"
     evolutions: [[41, 42, 169]]
@@ -76,7 +79,8 @@ card_families:
     evolutions: [[58, 59]]
   # Poliwag → Poliwhirl → Poliwrath / Poliwag → Poliwhirl → Politoed
   - name: "Poliwag Family"
-    evolutions: [[60, 61, 62], [60, 61, 186]]
+    # evolutions: [[60, 61, 62], [60, 61, 186]]
+    evolutions: [[60, 61, 62]] # Politoed (186, not out yet)
   # Abra → Kadabra → Alakazam
   - name: "Abra Family"
     evolutions: [[63, 64, 65]]
@@ -139,7 +143,8 @@ card_families:
     evolutions: [[104, 105]]
   # Tyrogue → Hitmonlee / Tyrogue → Hitmonchan / Tyrogue → Hitmontop
   - name: "Tyrogue/Hitmon Family"
-    evolutions: [[236, 106], [236, 107], [236, 237]]
+    # evolutions: [[236, 106], [236, 107], [236, 237]]
+    evolutions: [[106], [107], [237]] # Tyrogue (236, not out yet)
   # Lickitung (no evolution)
   - name: "Lickitung"
     evolutions: [[108]]
@@ -160,7 +165,8 @@ card_families:
     evolutions: [[115]]
   # Horsea → Seadra → Kingdra
   - name: "Horsea Family"
-    evolutions: [[116, 117, 230]]
+    # evolutions: [[116, 117, 230]]
+    evolutions: [[116, 117]] # Kingdra (230, not out yet)
   # Goldeen → Seaking
   - name: "Goldeen Family"
     evolutions: [[118, 119]]
@@ -197,9 +203,19 @@ card_families:
   # Ditto (no evolution)
   - name: "Ditto"
     evolutions: [[132]]
-  # Eevee → Vaporeon / Eevee → Jolteon / Eevee → Flareon / Eevee → Espeon / Eevee → Umbreon
+  # Eevee → Vaporeon / Eevee → Jolteon / Eevee → Flareon / Eevee → Espeon / Eevee → Umbreon / Eevee → Leafeon / Eevee → Glaceon / Eevee → Sylveon
   - name: "Eevee Family"
-    evolutions: [[133, 134], [133, 135], [133, 136], [133, 196], [133, 197]]
+    evolutions:
+      [
+        [133, 134],
+        [133, 135],
+        [133, 136],
+        [133, 196],
+        [133, 197],
+        [133, 470],
+        [133, 471],
+        [133, 700],
+      ]
   # Porygon → Porygon2
   - name: "Porygon Family"
     evolutions: [[137, 233]]
@@ -268,7 +284,8 @@ card_families:
     evolutions: [[179, 180, 181]]
   # Azurill → Marill → Azumarill
   - name: "Azurill/Marill Family"
-    evolutions: [[298, 183, 184]]
+    # evolutions: [[298, 183, 184]]
+    evolutions: [[183, 184]] # Azurill (298, not out yet)
   # Sudowoodo (no evolution)
   - name: "Sudowoodo"
     evolutions: [[185]]

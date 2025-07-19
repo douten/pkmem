@@ -21,43 +21,49 @@ skipped_sets = []
 created_sets = []
 
 config['card_families'].each_with_index do |family_config, index|
-  # Process evolution chains - flatten all cards from all evolution paths
-  all_cards = family_config['evolutions'].flatten.uniq
+  # Process each evolution chain separately
+  family_config['evolutions'].each_with_index do |evolution_path, path_index|
+    # Get cards for this specific evolution path
+    all_cards = evolution_path.uniq
 
-  # Filter to only include cards that exist in the TCG Pocket database
-  available_cards = all_cards.select { |card_number| available_card_ids.include?(card_number.to_s) }
-  missing_cards = all_cards - available_cards
+    # Filter to only include cards that exist in the TCG Pocket database
+    available_cards = all_cards.select { |card_number| available_card_ids.include?(card_number.to_s) }
+    missing_cards = all_cards - available_cards
 
-  # Only create CardSet if at least one card is available
-  if available_cards.empty?
-    skipped_sets << {
-      name: family_config['name'],
-      missing_cards: missing_cards
-    }
-    puts "⚠️  Skipping CardSet '#{family_config['name']}' - no cards available in TCG Pocket database"
-    next
-  end
+    # Only create CardSet if ALL cards in the evolution path are available
+    if missing_cards.any?
+      skipped_sets << {
+        name: family_config['name'],
+        missing_cards: missing_cards
+      }
+      puts "⚠️  Skipping CardSet '#{family_config['name']}' - missing cards: #{missing_cards.join(', ')}"
+      next
+    end
 
-  # Create the CardSet with available cards only
-  card_set = CardSet.find_or_create_by!(number: index + 1) do |cs|
-    cs.name = family_config['name']
-  end
+    # Create the CardSet with available cards only
+    # If there are multiple evolution paths, add a suffix to the name
+    set_name = if family_config['evolutions'].length > 1
+                 "#{family_config['name']} #{path_index + 1}"
+    else
+                 family_config['name']
+    end
 
-  # Update name if it changed
-  card_set.update!(name: family_config['name']) if card_set.name != family_config['name']
+    # Use a unique identifier that includes the path index
+    set_identifier = index * 100 + path_index + 1
 
-  available_cards.each do |card_number|
-    # Create card if it doesn't already exist
-    card = Card.find_or_create_by!(number: card_number)
-    card_set.cards << card unless card_set.cards.include?(card)
-  end
+    card_set = CardSet.find_or_create_by!(number: set_identifier) do |cs|
+      cs.name = set_name
+    end
 
-  created_sets << family_config['name']
-  
-  if missing_cards.any?
-    puts "✅ Created CardSet '#{family_config['name']}' with #{available_cards.size} cards (skipped #{missing_cards.size} missing: #{missing_cards.join(', ')})"
-  else
-    puts "✅ Created CardSet '#{family_config['name']}' with #{available_cards.size} cards"
+    available_cards.each do |card_number|
+      # Create card if it doesn't already exist
+      card = Card.find_or_create_by!(number: card_number)
+      card_set.cards << card unless card_set.cards.include?(card)
+    end
+
+    created_sets << set_name
+
+    puts "✅ Created CardSet '#{set_name}' with #{available_cards.size} cards"
   end
 end
 

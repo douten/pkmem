@@ -24,6 +24,10 @@ class Game < ApplicationRecord
       game_stream[:delay] = opts[:delay]
     end
 
+    if opts[:matched_cards]
+      game_stream[:matched_cards] = opts[:matched_cards].map { |gc| gc.id }
+    end
+
     if opts[:images_array]
       game_stream[:images_array] = self.cards.map { |card| card.image_url(self.id) }
     end
@@ -159,7 +163,7 @@ class Game < ApplicationRecord
 
     # Returning true will delay(interval) the front end state update
     # So the player will have time to see the flipped cards, before they flip down
-    non_matching_cards.length > 0
+    [ all_matching_cards ? player_flipped_game_cards : [], non_matching_cards.length > 0 ]
   end
 
   def concede(player = nil)
