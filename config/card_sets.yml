@@ -3,7 +3,7 @@ card_families:
   - name: "Bulbasaur Family"
     evolutions: [[1, 2, 3]]
   # Charmander → Charmeleon → Charizard
-  - name: "Charmander Family" 
+  - name: "Charmander Family"
     evolutions: [[4, 5, 6]]
   # Squirtle → Wartortle → Blastoise
   - name: "Squirtle Family"
@@ -268,7 +268,7 @@ card_families:
     evolutions: [[179, 180, 181]]
   # Azurill → Marill → Azumarill
   - name: "Azurill/Marill Family"
-    evolutions: [[182, 183, 184]]
+    evolutions: [[298, 183, 184]]
   # Sudowoodo (no evolution)
   - name: "Sudowoodo"
     evolutions: [[185]]
