@@ -1,8 +1,8 @@
 class GamesChannel < ApplicationCable::Channel
-  after_subscribe :init_player, if: -> { @game.present? && @game.state != "finished" }
-  after_subscribe :init_game, if: -> { open_connections.count == 2 && @game.state != "finished" }
-  after_unsubscribe :clear_player, if: -> { @game.present? && @game.state != "finished" }
-  after_unsubscribe :cleanup_game, if: -> { open_connections.empty? && @game.state != "finished" }
+  after_subscribe :init_player, if: -> { has_unfinished_game? }
+  after_subscribe :init_game, if: -> { has_unfinished_game? && open_connections.count == 2 }
+  after_unsubscribe :clear_player, if: -> { has_unfinished_game? }
+  after_unsubscribe :cleanup_game, if: -> { has_unfinished_game? && open_connections.empty? }
 
   # CHANNEL CALLBACKS
   def connect
@@ -16,6 +16,8 @@ class GamesChannel < ApplicationCable::Channel
       @game = Game.find(game_id)
 
       stream_or_reject_for(@game)
+    rescue ActiveRecord::RecordNotFound
+      reject
     end
   end
 
@@ -48,8 +50,8 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def cleanup_game
-    @game.destroy
-  rescue StandardError => e
+    @game.update(state: "abandoned")
+  rescue StandardError
     # Handle any cleanup errors gracefully
     @game.update(state: "error") if @game.present?
   end
@@ -121,6 +123,11 @@ class GamesChannel < ApplicationCable::Channel
 
   def game_player
     @game.game_players.find { |gp| gp.guest_id == connection.guest_id }
+  end
+
+  def has_unfinished_game?
+    return false if @game.nil?
+    @game.state != "finished"
   end
 
   def current_player
