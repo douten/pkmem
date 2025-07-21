@@ -1,6 +1,6 @@
 class Game < ApplicationRecord
   TOTAL_CARDS_ON_BOARD = 16
-  TOTAL_CARDS = 50
+  POINTS_TO_WIN = 15
 
   has_many :game_cards, dependent: :destroy
   has_many :game_players, dependent: :destroy
@@ -12,7 +12,7 @@ class Game < ApplicationRecord
   before_save :cleanup_game, if: :will_save_change_to_state?
 
   # validates that cards exist when there's two players
-  validates :cards, length: { is: TOTAL_CARDS }, if: :enough_players?
+  validates :cards, length: { is: total_cards_in_game }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
 
   def stream(opts = {})
@@ -237,7 +237,7 @@ class Game < ApplicationRecord
 
   # MODEL ACTIONS
   def set_cards
-    total_cards = TOTAL_CARDS
+    total_cards = total_cards_in_game
 
     CardSet.all.shuffle.each do |set|
       number_of_cards_to_add = set.cards.length < 2 ? 2 : set.cards.length
@@ -251,7 +251,7 @@ class Game < ApplicationRecord
       # next if self.cards.length + number_of_cards_to_add == total_cards - 1
 
       # If we already have enough cards, skip to the break
-      break if self.cards.length >= total_cards
+      break if self.cards.length == total_cards
 
       if set.cards.length == 1
         self.cards.concat([ set.cards.first, set.cards.first ])
@@ -267,6 +267,25 @@ class Game < ApplicationRecord
       game_card.position = index + 1
       game_card.save
     end
+  end
+  # Calculates the total number of cards needed for the game.
+  #
+  # Formula:
+  #   total_cards = 2 * (points_to_win - 1) + 3 + total_cards_on_board
+  #
+  # Explanation:
+  #   - Both players could be at (points_to_win - 1) before the final turn.
+  #   - A player can win with a 3-card match, so add 3 for the final possible match.
+  #   - The board must always be full, so add total_cards_on_board.
+  #
+  # This ensures the board is always full, even if the last match is a 3-card match.
+  def self.total_cards_in_game
+    2 * (POINTS_TO_WIN - 1) + 3 + TOTAL_CARDS_ON_BOARD
+  end
+
+  # Instance method version for validations and instance use
+  def total_cards_in_game
+    self.class.total_cards_in_game
   end
 
   def cleanup_game
