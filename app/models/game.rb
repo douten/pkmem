@@ -213,6 +213,7 @@ class Game < ApplicationRecord
   end
 
   def stream_cards
+    return [] if %w[abandoned finished].include?(self.state)
     self.game_cards.filter { |gc| gc.position && gc.position > 0 }.sort_by(&:position).map do |game_card|
       {
         id: game_card.id,
@@ -270,7 +271,7 @@ class Game < ApplicationRecord
 
   def cleanup_game
     # If the game is finished, destroy all game cards
-    if self.state == "finished"
+    if self.state == "finished" || self.state == "abandoned"
       self.game_cards.destroy_all
     end
   end
