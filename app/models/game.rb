@@ -1,5 +1,6 @@
 class Game < ApplicationRecord
   TOTAL_CARDS_ON_BOARD = 16
+  TOTAL_CARDS = 50
 
   has_many :game_cards, dependent: :destroy
   has_many :game_players, dependent: :destroy
@@ -11,7 +12,7 @@ class Game < ApplicationRecord
   before_save :cleanup_game, if: :will_save_change_to_state?
 
   # validates that cards exist when there's two players
-  validates :cards, length: { is: 40 }, if: :enough_players?
+  validates :cards, length: { is: TOTAL_CARDS }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
 
   def stream(opts = {})
@@ -235,7 +236,7 @@ class Game < ApplicationRecord
 
   # MODEL ACTIONS
   def set_cards
-    total_cards = 40
+    total_cards = TOTAL_CARDS
 
     CardSet.all.shuffle.each do |set|
       number_of_cards_to_add = set.cards.length < 2 ? 2 : set.cards.length
