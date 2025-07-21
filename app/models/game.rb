@@ -302,7 +302,7 @@ class Game < ApplicationRecord
   end
 
   def needs_cards?
-    self.cards.length < TOTAL_CARDS_ON_BOARD && enough_players?
+    self.cards.length < total_cards_in_game && enough_players?
   end
 
   def all_game_cards_flipped?
