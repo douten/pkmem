@@ -92,24 +92,39 @@ class GamesChannel < ApplicationCable::Channel
   private
 
   def open_connections
-    all_game_connections.select do |conn|
-      state = conn.instance_values["websocket"].instance_values["websocket"].instance_variable_get(:@driver).state
-      state == :open
-    end.map { |conn| conn.guest_id }
+    connections = all_game_connections
+    return [] if connections.empty?
+
+    begin
+      connections.select do |conn|
+        state = conn.instance_values["websocket"].instance_values["websocket"].instance_variable_get(:@driver).state
+        state == :open
+      end.map { |conn| conn.guest_id }
+    rescue StandardError => e
+      puts "Error checking connection states: #{e.message}"
+      []
+    end
   end
 
   def all_game_connections
     # This method returns all connections for the current game
     # identifiers: ["{\"channel\":\"GamesChannel\",\"id\":\"1752164909411\",\"game_id\":\"531\",\"get_images\":false}"]
-    ActionCable.server.connections.select do |conn|
-      conn.subscriptions.identifiers.any? do |identifier|
-        begin
-          data = JSON.parse(identifier)
-          data["game_id"].to_i == @game.id
-        rescue JSON::ParserError
-          false
+    return [] if @game.nil?
+
+    begin
+      ActionCable.server.connections.select do |conn|
+        conn.subscriptions.identifiers.any? do |identifier|
+          begin
+            data = JSON.parse(identifier)
+            data["game_id"].to_i == @game.id
+          rescue JSON::ParserError
+            false
+          end
         end
       end
+    rescue StandardError => e
+      puts "Error getting game connections: #{e.message}"
+      []
     end
   end
 
