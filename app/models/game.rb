@@ -56,7 +56,7 @@ class Game < ApplicationRecord
 
     # we can just check for the first flipped card's matching number set
     # as all cards need to match *a* set
-    matching_number_set = player_flipped_game_cards&.first.matching_number_set
+    matching_number_set = player_flipped_game_cards&.first.evolution_number_set
     # any flipped cards that doesn't match the first flipped card's set
     non_matching_cards = player_flipped_game_cards.select do |flipped_game_card|
       !matching_number_set.include?(flipped_game_card.card.number)
@@ -247,7 +247,7 @@ class Game < ApplicationRecord
     # default is 2 unless there's a set of 3
     max = 2
 
-    if flipped_game_cards.length > 0 && flipped_game_cards.first.matching_number_set.length > 2
+    if flipped_game_cards.length > 0 && flipped_game_cards.first.evolution_number_set.length > 2
       max = 3
     end
 
