@@ -90,8 +90,7 @@ class Game < ApplicationRecord
     return false if player.nil? || !player_flipped_game_cards || player_flipped_game_cards.length < 2
 
     # Find the matching set of the flipped cards. In the future we can
-    # compare to all sets of flipped cards, but for now we just use the last
-    matching_number_set = player_flipped_game_cards.last.matching_number_set
+    matching_number_set = player_flipped_game_cards.last.evolution_number_set
 
     # If there's a flipped card that doesn't match the set then it's a sign
     # the player can't continue flipping cards

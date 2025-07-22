@@ -36,7 +36,7 @@ config['card_families'].each_with_index do |family_config, index|
         name: family_config['name'],
         missing_cards: missing_cards
       }
-      puts "⚠️  Skipping CardSet '#{family_config['name']}' - missing cards: #{missing_cards.join(', ')}"
+      puts "⚠️ Skipping CardSet '#{family_config['name']}' - missing cards: #{missing_cards.join(', ')}"
       next
     end
 
@@ -56,8 +56,11 @@ config['card_families'].each_with_index do |family_config, index|
     end
 
     available_cards.each do |card_number|
+      # Get the name from PokemonDatabase using card_number as id
+      pokemon = PokemonDatabase.all.find { |p| p[:id].to_s == card_number.to_s }
+      card_name = pokemon ? pokemon[:name][:english] : "Doesn't Exist"
       # Create card if it doesn't already exist
-      card = Card.find_or_create_by!(number: card_number)
+      card = Card.find_or_create_by!(number: card_number, name: card_name)
       card_set.cards << card unless card_set.cards.include?(card)
     end
 

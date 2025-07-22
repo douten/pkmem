@@ -25,4 +25,8 @@ class Card < ApplicationRecord
       urls.sample
     end
   end
+
+  def evolution_number_set
+    self.card_sets.flat_map { |set| set.cards.map(&:number) }.uniq
+  end
 end

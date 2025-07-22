@@ -29,7 +29,7 @@ class GameCard < ApplicationRecord
     end
   end
 
-  def matching_number_set
-    self.card.card_sets.first.cards.map(&:number).uniq
+  def evolution_number_set
+    self.card.evolution_number_set
   end
 end
