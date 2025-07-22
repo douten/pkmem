@@ -12,7 +12,7 @@ class Game < ApplicationRecord
   before_save :cleanup_game, if: :will_save_change_to_state?
 
   # validates that cards exist when there's two players
-  validates :cards, length: { is: ->(game) { game.total_cards_in_game } }, if: :enough_players?
+  validates :cards, length: { minimum: ->(game) { game.total_cards_in_game } }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
 
   def stream(opts = {})
@@ -259,24 +259,13 @@ class Game < ApplicationRecord
     total_cards = total_cards_in_game
 
     CardSet.all.shuffle.each do |set|
-      number_of_cards_to_add = set.cards.length < 2 ? 2 : set.cards.length
-
-      cards_will_exceed_total = self.cards.length + number_of_cards_to_add > total_cards
-      # If adding this set's cards would exceed the total, skip to the next set
-      next if cards_will_exceed_total
-
-      # # If adding this set's cards would leave us with one card short of the total, skip to the next set
-      # # This will ensure sets with one card will create pairs
-      # next if self.cards.length + number_of_cards_to_add == total_cards - 1
-
-      # If we already have enough cards, skip to the break
-      break if self.cards.length == total_cards
-
       if set.cards.length == 1
         self.cards.concat([ set.cards.first, set.cards.first ])
       else
         self.cards.concat(set.cards.shuffle)
       end
+
+      break if self.cards.length >= total_cards
     end
 
     # variable for up to 16 cards that matches to put on the board initially
