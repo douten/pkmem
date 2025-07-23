@@ -1,16 +1,9 @@
 class GamesChannel < ApplicationCable::Channel
-  after_subscribe :handle_player_connection, if: -> { has_unfinished_game? }, unless: :subscription_rejected?
-  after_subscribe :init_game, if: -> { has_unfinished_game? && open_connections.count == 2 }
+  after_subscribe :handle_player_connection, unless: :subscription_rejected?
   after_subscribe :broadcast_game, if: -> { @game.present? && %w[abandoned finished].include?(@game.state) }
-  after_unsubscribe :clear_player, if: -> { has_unfinished_game? }
-  after_unsubscribe :cleanup_game, if: -> { has_unfinished_game? && open_connections.empty? }
+  after_unsubscribe :handle_player_disconnection
 
   # CHANNEL CALLBACKS
-  def connect
-    puts "Connecting to GamesChannel"
-    # Any setup needed when channel is connected
-  end
-
   def subscribed
     begin
       game_id = params[:game_id]
@@ -22,44 +15,41 @@ class GamesChannel < ApplicationCable::Channel
     end
   end
 
-  def receive(data)
-    puts "Received data: #{data.inspect}"
-  end
+  def handle_player_connection
+    connect_player
+    # Start the game if there are two players connected and game is matching
+    if @game.matching? && open_connections.count == 2
+      @game.update(state: "playing")
+      broadcast_game(broadcast_opts_params)
+    end
 
-  def init_player
-    if game_player.present?
-      game_player.update(connected: true)
-      game_player.player.update(status: "playing")
+    if @game.playing? && open_connections.count == 1
+      broadcast_game(broadcast_opts_params)
     end
   end
 
-  def clear_player
-    if game_player.present?
-      game_player.update(connected: false)
-      game_player.player.update(status: "inactive")
+  def handle_player_disconnection
+    disconnection_player
+
+    # Transition game to abandoned if no players while playing
+    if @game.playing? && open_connections.count == 0
+      @game.update(state: "abandoned")
     end
   end
 
-  def init_game
-    @game.update(state: "playing")
-
-    if params[:get_images]
-      broadcast_game({ images_array: true })
-    else
-      broadcast_game
+  # SET UP & CLEAN UP HELPERS
+  def connect_player
+    if connection_game_player.present?
+      connection_game_player.update(connected: true)
+      connection_game_player.player.update(status: "playing")
     end
   end
 
-  def cleanup_game
-    @game.update(state: "abandoned")
-  rescue StandardError
-    # Handle any cleanup errors gracefully
-    @game.update(state: "error") if @game.present?
-  end
-
-  # CLIENT ACTIONS (actions sent in from client)
-  def get_game
-    broadcast_game
+  def disconnection_player
+    if connection_game_player.present?
+      connection_game_player.update(connected: false)
+      connection_game_player.player.update(status: "inactive")
+    end
   end
 
   # GAME ACTIONS
@@ -107,6 +97,8 @@ class GamesChannel < ApplicationCable::Channel
     end
   end
 
+  # TODO: consider using game_player.connected instead of subscriptions identifiers?
+  # Actioncable isn't used in LobbyChannel
   def all_game_connections
     # This method returns all connections for the current game
     # identifiers: ["{\"channel\":\"GamesChannel\",\"id\":\"1752164909411\",\"game_id\":\"531\",\"get_images\":false}"]
@@ -137,23 +129,15 @@ class GamesChannel < ApplicationCable::Channel
     )
   end
 
-  def game_player
+  def connection_game_player
     @game.game_players.find { |gp| gp.guest_id == connection.guest_id }
-  end
-
-  def has_unfinished_game?
-    return false if @game.nil?
-    @game.state != "finished"
   end
 
   def current_player
     connection.player
   end
 
-  def opponent_player
-    @game.players.find { |p| p.guest_id != current_player.guest_id }
-  rescue StandardError => e
-    puts "Error finding opponent player: #{e.message}"
-    nil
+  def broadcast_opts_params
+    ActionController::Parameters.new(params[:opts])&.permit(:images_array) || {}
   end
 end
