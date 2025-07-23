@@ -42,15 +42,9 @@ class Game < ApplicationRecord
     self.class.total_cards_in_game
   end
 
-  # ...existing code...
-
   # MODEL ACTIONS
   def set_cards
     GameActionHandler.set_cards(self)
-  end
-
-  def remove_game_cards
-    self.game_cards.destroy_all
   end
 
   # DYNAMIC ATTRIBUTES

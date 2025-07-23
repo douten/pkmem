@@ -24,9 +24,5 @@ module GameStateValidations
     # validates that cards exist when there's two players
     validates :cards, length: { minimum: ->(game) { game.total_cards_in_game } }, if: :enough_players?
     before_validation :set_cards, if: :needs_cards?
-
-    # Callbacks
-    # Remove game_cards when game terminates to free up records
-    before_save :remove_game_cards, if: -> { will_save_change_to_state? && UNPLAYABLE_STATES.include?(state) }
   end
 end
