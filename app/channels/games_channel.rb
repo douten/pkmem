@@ -121,7 +121,7 @@ class GamesChannel < ApplicationCable::Channel
     @game.reload
 
     GamesChannel.broadcast_to(@game,
-      games_channel: { **@game.stream(opts) }
+      games_channel: { **GameStreamBuilder.new(@game).build(opts) }
     )
   end
 
