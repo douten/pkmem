@@ -122,26 +122,39 @@ class GameActionHandler
     )
   end
 
+  # Main method to generate cards for the game
   def self.set_cards(game)
     total_cards = game.total_cards_in_game
+    # game_cards in the same card sets will be grouped together
+    # when created below. Despite the shuffle, they'll still be
+    # created in near sucession if added to game.cards right away
+    # we'll need to store them in a temporary array first
+    # then shuffle them into game.cards
+    new_cards = []
 
     CardSet.all.shuffle.each do |set|
       if set.cards.length == 1
-        game.cards.concat([ set.cards.first, set.cards.first ])
+        new_cards.concat([ set.cards.first, set.cards.first ])
       else
-        game.cards.concat(set.cards.shuffle)
+        new_cards.concat(set.cards.shuffle)
       end
 
-      break if game.cards.length >= total_cards
+      break if new_cards.length >= total_cards
     end
 
     # variable for up to 16 cards that matches to put on the board initially
-    first_board_game_card_set = game.game_cards.take(Game::TOTAL_CARDS_ON_BOARD)
+    # we don't want to mess with the position since we want matching cards
+    first_board_game_card_set = new_cards.take(Game::TOTAL_CARDS_ON_BOARD).shuffle
+    remaining_cards = new_cards - first_board_game_card_set
 
-    first_board_game_card_set.shuffle.each_with_index do |game_card, index|
+    game.cards = first_board_game_card_set
+    # set positions for the first 16 cards
+    game.game_cards.each_with_index do |game_card, index|
       game_card.position = index + 1
       game_card.save
     end
+
+    game.cards.concat(remaining_cards.shuffle)
   end
 
   def self.can_flip?(game, player)
