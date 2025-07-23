@@ -8,12 +8,40 @@ class Game < ApplicationRecord
   has_many :players, through: :game_players
   has_many :logs, dependent: :destroy
 
-  # before_save :set_cards, if: :needs_cards?
-  before_save :cleanup_game, if: :will_save_change_to_state?
+  # Game State Machine
+  enum :state, {
+    matching: "matching",
+    playing: "playing",
+    finished: "finished",
+    abandoned: "abandoned",
+    error: "error"
+  }
+  TERMINAL_STATES = %w[finished abandoned error].freeze
+  UNPLAYABLE_STATES = %w[abandoned error].freeze
+
+  # validate states
+  # includes correct states
+  validates :state, inclusion: { in: states.keys }, if: -> { state_changed? }
+  # matching -> playing, error
+  validates :state, inclusion: { in: %w[playing error],
+      message: ->(object, _) { state_machine_error_message(object) }
+    }, if: -> { state_changed? && state_was == "matching" }
+  # # playing -> finished, abandoned, error
+  validates :state, inclusion: { in: TERMINAL_STATES,
+      message: ->(object, _) { state_machine_error_message(object) }
+    }, if: -> { state_changed? && state_was == "playing" }
+  # finished, abandoned, error -> no transitions
+  validates :state, inclusion: { in: [],
+      message: ->(object, _) { state_machine_error_message(object) }
+    }, if: -> { state_changed? && TERMINAL_STATES.include?(state_was) }
 
   # validates that cards exist when there's two players
   validates :cards, length: { minimum: ->(game) { game.total_cards_in_game } }, if: :enough_players?
   before_validation :set_cards, if: :needs_cards?
+
+  # Callbacks
+  # Remove game_cards when game terminates to free up records
+  before_save :remove_game_cards, if: -> { will_save_change_to_state? && UNPLAYABLE_STATES.include?(state) }
 
   def stream(opts = {})
     game_stream = {
@@ -277,11 +305,8 @@ class Game < ApplicationRecord
     end
   end
 
-  def cleanup_game
-    # If the game is finished, destroy all game cards
-    if self.state == "finished" || self.state == "abandoned"
-      self.game_cards.destroy_all
-    end
+  def remove_game_cards
+    self.game_cards.destroy_all
   end
 
   # DYNAMIC ATTRIBUTES
@@ -297,5 +322,10 @@ class Game < ApplicationRecord
     self.game_cards.all? do |game_card|
       game_card.face_up? && game_card.scored_by
     end
+  end
+
+  # HELPER METHODS
+  def self.state_machine_error_message(object)
+    "[#{object.state_was}] cannot transition into [#{object.state}]. See Game State Machine."
   end
 end

@@ -1,5 +1,5 @@
 class GamesChannel < ApplicationCable::Channel
-  after_subscribe :init_player, if: -> { has_unfinished_game? }
+  after_subscribe :handle_player_connection, if: -> { has_unfinished_game? }, unless: :subscription_rejected?
   after_subscribe :init_game, if: -> { has_unfinished_game? && open_connections.count == 2 }
   after_subscribe :broadcast_game, if: -> { @game.present? && %w[abandoned finished].include?(@game.state) }
   after_unsubscribe :clear_player, if: -> { has_unfinished_game? }
