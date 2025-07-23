@@ -1,6 +1,5 @@
 class GamesChannel < ApplicationCable::Channel
   after_subscribe :handle_player_connection, unless: :subscription_rejected?
-  after_subscribe :broadcast_game, if: -> { @game.present? && %w[abandoned finished].include?(@game.state) }
   after_unsubscribe :handle_player_disconnection
 
   # CHANNEL CALLBACKS
@@ -16,20 +15,27 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def handle_player_connection
-    connect_player
+    update_player_status(true, "playing") if connection_game_player.present?
+
     # Start the game if there are two players connected and game is matching
     if @game.matching? && open_connections.count == 2
       @game.update(state: "playing")
       broadcast_game(broadcast_opts_params)
     end
 
+    # If the game is already playing and only one player is connected, broadcast the game state
     if @game.playing? && open_connections.count == 1
       broadcast_game(broadcast_opts_params)
+    end
+
+    # If the game is finished or abandoned, broadcast the final state
+    if @game.finished? || @game.abandoned?
+      broadcast_game
     end
   end
 
   def handle_player_disconnection
-    disconnection_player
+    update_player_status(false, "inactive") if connection_game_player.present?
 
     # Transition game to abandoned if no players while playing
     if @game.playing? && open_connections.count == 0
@@ -38,18 +44,9 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   # SET UP & CLEAN UP HELPERS
-  def connect_player
-    if connection_game_player.present?
-      connection_game_player.update(connected: true)
-      connection_game_player.player.update(status: "playing")
-    end
-  end
-
-  def disconnection_player
-    if connection_game_player.present?
-      connection_game_player.update(connected: false)
-      connection_game_player.player.update(status: "inactive")
-    end
+  def update_player_status(connected, status)
+    connection_game_player.update(connected:)
+    connection_game_player.player.update(status:)
   end
 
   # GAME ACTIONS
