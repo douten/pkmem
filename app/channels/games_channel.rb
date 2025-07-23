@@ -54,25 +54,21 @@ class GamesChannel < ApplicationCable::Channel
 
   # GAME ACTIONS
   def flip_card(data)
-    if !@game.can_flip?(current_player)
-      return
-    end
+    # flip the card
+    GameActionHandler.flip_card(@game, data["game_card_id"], current_player)
 
-    game_card = @game.game_cards.find(data["game_card_id"])
-    game_card.update(
-      face_up: true,
-      flipped_by: current_player.guest_id
-    )
-
+    # broadcast the game state
     broadcast_game
 
-    # game progresses / validation of action, then broadcast the game state
-    matched_cards, delay_update = @game.progress_game(current_player)
+    # game progresses / validation of action
+    matched_cards, delay_update = GameActionHandler.turn_processor(@game, current_player)
+    # then broadcast the new game state
     broadcast_game({ delay: delay_update ? 1000 : 0, matched_cards: matched_cards })
   end
 
   def concede(data)
-    @game.concede(current_player)
+    GameActionHandler.concede(@game, current_player)
+
     @game.game_players.each do |game_player|
       game_player.player.update(status: "inactive")
     end
