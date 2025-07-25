@@ -19,7 +19,7 @@ class GameActionHandler
       player_flipped_game_cards.length < 2
 
     # Find the matching set of the flipped cards. In the future we can
-    matching_number_set = player_flipped_game_cards.last.evolution_line_count
+    matching_number_set = player_flipped_game_cards.last.evolution_number_set
 
     # If there's a flipped card that doesn't match the set then it's a sign
     # the player can't continue flipping cards
@@ -28,7 +28,7 @@ class GameActionHandler
     end
 
     cards_match_whole_set = non_matching_cards.length == 0 &&
-      player_flipped_game_cards.length >= matching_number_set.length
+      player_flipped_game_cards.length >= player_flipped_game_cards.first.evolution_line_count
 
     opponent_player = game.players.find { |p| p.guest_id != player.guest_id }
 

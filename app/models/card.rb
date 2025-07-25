@@ -36,6 +36,6 @@ class Card < ApplicationRecord
     # but the evolution line is only 3. Split between 45 and 182.
     # So we can't use evolution_number_set length to know if the amount
     # of cards flipped is enough to match the set. As it'll expect 4 cards.
-    self.card_sets.card_sets.map { |cs| cs.cards.map(&:number) }.map(&:length).max
+    self.card_sets.map { |cs| cs.cards.map(&:number) }.map(&:length).max
   end
 end
