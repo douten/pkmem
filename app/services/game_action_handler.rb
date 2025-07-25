@@ -13,8 +13,10 @@ class GameActionHandler
     player_flipped_game_cards = self.flipped_game_cards(game, player)
 
     # If the player has no flipped cards, or less than 2, they can continue flipping
-    # Returning false will not delay(interval) the front end state update
-    return false if player.nil? || !player_flipped_game_cards || player_flipped_game_cards.length < 2
+    # We exit the method now so it doesn't flip cards back down
+    return self.turn_results(game: game, current_player: player) if player.nil? ||
+      !player_flipped_game_cards ||
+      player_flipped_game_cards.length < 2
 
     # Find the matching set of the flipped cards. In the future we can
     matching_number_set = player_flipped_game_cards.last.evolution_number_set
@@ -25,10 +27,12 @@ class GameActionHandler
       !matching_number_set.include?(flipped_game_card.card.number)
     end
 
-    all_matching_cards = non_matching_cards.length == 0 &&
+    cards_match_whole_set = non_matching_cards.length == 0 &&
       player_flipped_game_cards.length >= matching_number_set.length
 
     opponent_player = game.players.find { |p| p.guest_id != player.guest_id }
+
+    new_cards_to_add = []
 
     if non_matching_cards.length > 0
       # resetting cards since they don't match
@@ -39,7 +43,7 @@ class GameActionHandler
         })
       end
       game.update({ turn: opponent_player.guest_id })
-    elsif all_matching_cards
+    elsif cards_match_whole_set
       # If all flipped cards match, we score the cards
       puts "Cards matched by player #{player.guest_id}."
 
@@ -65,6 +69,7 @@ class GameActionHandler
 
         # Update the card's position and track its card sets
         unpositioned_card.update({ position: position })
+        new_cards_to_add << unpositioned_card
         used_card_sets.concat(unpositioned_card.card.card_sets)
       end
 
@@ -88,9 +93,12 @@ class GameActionHandler
       game.update({ state: "finished" })
     end
 
-    # Returning true will delay(interval) the front end state update
-    # So the player will have time to see the flipped cards, before they flip down
-    [ all_matching_cards ? player_flipped_game_cards : [], non_matching_cards.length > 0 ]
+    self.turn_results(game: game,
+      current_player: player,
+      new_cards_to_add:,
+      cards_match_whole_set:,
+      no_match: non_matching_cards.length > 0,
+    )
   end
 
   def self.concede(game, player)
@@ -185,7 +193,31 @@ class GameActionHandler
     has_turn && (player_flipped_game_cards.length < self.max_flippable_cards(game)) && !non_matching_set
   end
 
+  def self.first_flip?(game, player)
+    game.reload
+    self.flipped_game_cards(game, player).length == 1
+  end
+
+  def self.flipped_cards_name(game, player)
+    game.reload
+    self.flipped_game_cards(game, player).map(&:name).to_sentence
+  end
+
   private
+
+  def self.turn_results(game:, current_player:, new_cards_to_add: [], cards_match_whole_set: false, no_match: false)
+    # interface GameTurnResultInterface
+    results = {
+      cards_match_whole_set:,
+      no_match:
+    }
+    results[:new_cards_to_add] = new_cards_to_add.present? ? new_cards_to_add.map(&:stream_data) : []
+    results[:flipped_game_cards] = GameActionHandler.flipped_game_cards(game, current_player).map(&:stream_data)
+    results[:first_flip] = GameActionHandler.first_flip?(game, current_player)
+    results[:flipped_cards_name] = GameActionHandler.flipped_cards_name(game, current_player)
+
+    results
+  end
 
   def self.max_flippable_cards(game)
     # default is 2 unless there's a set of 3
@@ -199,6 +231,8 @@ class GameActionHandler
   end
 
   def self.flipped_game_cards(game, player = nil)
+    game.reload
+
     if player.nil? || player.guest_id.nil?
       game.game_cards.select { |gc| gc.face_up? && gc.scored_by.nil? }
     else

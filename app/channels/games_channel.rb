@@ -18,20 +18,14 @@ class GamesChannel < ApplicationCable::Channel
     update_player_status(true, "playing") if connection_game_player.present?
 
     # Start the game if there are two players connected and game is matching
-    if @game.matching? && open_connections.count == 2
+    if @game.matching?
       @game.update(state: "playing")
-      broadcast_game(broadcast_opts_params)
     end
 
-    # If the game is already playing and only one player is connected, broadcast the game state
-    if @game.playing? && open_connections.count == 1
-      broadcast_game(broadcast_opts_params)
-    end
+    no_opts_states = @game.finished? || @game.abandoned?
+    opts = no_opts_states ? {} : broadcast_opts_params
 
-    # If the game is finished or abandoned, broadcast the final state
-    if @game.finished? || @game.abandoned?
-      broadcast_game
-    end
+    broadcast_game(opts) unless @game.error?
   end
 
   def handle_player_disconnection
@@ -53,14 +47,16 @@ class GamesChannel < ApplicationCable::Channel
   def flip_card(data)
     # flip the card
     GameActionHandler.flip_card(@game, data["game_card_id"], current_player)
+    # broadcast the new card flipped, for FE to update.
+    # mainly for the url for the image. We only want to broadcast
+    # that when the card is flipped so FE can't inspect unflipped cards
+    turn_result = GameActionHandler.turn_results(game: @game, current_player:)
+    broadcast_game({ turn_result: })
 
-    # broadcast the game state
-    broadcast_game
-
-    # game progresses / validation of action
-    matched_cards, delay_update = GameActionHandler.turn_processor(@game, current_player)
+    # progress game - see if it's first flip, a match, game is finished, etc.
+    turn_result = GameActionHandler.turn_processor(@game, current_player)
     # then broadcast the new game state
-    broadcast_game({ delay: delay_update ? 1000 : 0, matched_cards: matched_cards })
+    broadcast_game({ turn_result: })
   end
 
   def concede(data)
@@ -131,6 +127,9 @@ class GamesChannel < ApplicationCable::Channel
   end
 
   def broadcast_opts_params
-    ActionController::Parameters.new(params[:opts])&.permit(:images_array) || {}
+    # ex: { init_game: true }
+    ActionController::Parameters.new(params[:opts] || {})
+      .permit(:init_game) # expand here if needed
+      .to_h.symbolize_keys
   end
 end

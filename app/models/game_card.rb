@@ -32,4 +32,18 @@ class GameCard < ApplicationRecord
   def evolution_number_set
     self.card.evolution_number_set
   end
+
+  def stream_data
+    self.reload
+    #  interface CardInterface
+    {
+      id: self.id,
+      image_url: self.face_up? ? self.image_url : nil,
+      position: self.position
+    }
+  end
+
+  def name
+    self.card.name
+  end
 end
