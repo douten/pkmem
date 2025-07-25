@@ -33,6 +33,10 @@ class GameCard < ApplicationRecord
     self.card.evolution_number_set
   end
 
+  def evolution_line_count
+    self.card.evolution_line_count
+  end
+
   def stream_data
     self.reload
     #  interface CardInterface

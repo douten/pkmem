@@ -19,7 +19,7 @@ class GameActionHandler
       player_flipped_game_cards.length < 2
 
     # Find the matching set of the flipped cards. In the future we can
-    matching_number_set = player_flipped_game_cards.last.evolution_number_set
+    matching_number_set = player_flipped_game_cards.last.evolution_line_count
 
     # If there's a flipped card that doesn't match the set then it's a sign
     # the player can't continue flipping cards
