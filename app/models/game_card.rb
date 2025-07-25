@@ -39,7 +39,8 @@ class GameCard < ApplicationRecord
     {
       id: self.id,
       image_url: self.face_up? ? self.image_url : nil,
-      position: self.position
+      position: self.position,
+      name: self.name
     }
   end
 

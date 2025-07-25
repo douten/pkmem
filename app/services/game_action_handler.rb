@@ -234,9 +234,9 @@ class GameActionHandler
     game.reload
 
     if player.nil? || player.guest_id.nil?
-      game.game_cards.select { |gc| gc.face_up? && gc.scored_by.nil? }
+      game.game_cards.select { |gc| gc.face_up? && gc.scored_by.nil? }.sort_by(&:updated_at)
     else
-      game.game_cards.select { |gc| gc.face_up? && gc.flipped_by == player.guest_id && gc.scored_by.nil? }
+      game.game_cards.select { |gc| gc.face_up? && gc.flipped_by == player.guest_id && gc.scored_by.nil? }.sort_by(&:updated_at)
     end
   end
 end
