@@ -18,7 +18,7 @@ class GamesChannel < ApplicationCable::Channel
     update_player_status(true, "playing") if connection_game_player.present?
 
     # Start the game if there are two players connected and game is matching
-    if @game.matching?
+    if @game.matching? && open_connections.count == 2
       @game.update(state: "playing")
     end
 

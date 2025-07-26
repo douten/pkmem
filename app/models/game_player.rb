@@ -3,6 +3,9 @@ class GamePlayer < ApplicationRecord
   belongs_to :player
   has_many :game_cards
 
+  # Set random player for first turn when enough players are present
+  after_create :set_turn_if_enough_players
+
   # GamePlayer attributes purpose:
   # - connected:
   #   whether the player is connected to the game
@@ -14,5 +17,13 @@ class GamePlayer < ApplicationRecord
 
   def guest_id
     player.guest_id
+  end
+
+  private
+
+  def set_turn_if_enough_players
+    if game.game_players.length == 2
+      game.update!({ turn: game.game_players.sample.guest_id })
+    end
   end
 end

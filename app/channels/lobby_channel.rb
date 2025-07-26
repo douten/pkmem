@@ -47,7 +47,7 @@ class LobbyChannel < ApplicationCable::Channel
   end
 
   def broadcast_new_game_id(players)
-    game = Game.create(state: "matching", turn: players.first.guest_id)
+    game = Game.create!
     players.each do |player|
       game.players << player
     end
