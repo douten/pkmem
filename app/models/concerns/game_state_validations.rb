@@ -2,8 +2,7 @@ module GameStateValidations
   extend ActiveSupport::Concern
 
   included do
-    TERMINAL_STATES = %w[finished abandoned error].freeze
-    UNPLAYABLE_STATES = %w[abandoned error].freeze
+    TERMINAL_STATES = %w[conceded finished abandoned error].freeze
 
     # validate states
     # includes correct states

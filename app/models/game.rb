@@ -15,6 +15,7 @@ class Game < ApplicationRecord
     playing: "playing",
     finished: "finished",
     abandoned: "abandoned",
+    conceded: "conceded",
     error: "error"
   }
   include GameStateValidations

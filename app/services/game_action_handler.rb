@@ -108,9 +108,9 @@ class GameActionHandler
     opponent_player = game.game_players.find { |p| p.guest_id != player.guest_id }
 
     if current_player && opponent_player
-      current_player.update({ score: -1 })
-      opponent_player.update({ score: 1 })
-      game.update({ state: "finished" })
+      current_player.update({ score: 0 })
+      opponent_player.update({ score: 15 })
+      game.update({ state: "conceded" })
       game.reload
       true
     else
