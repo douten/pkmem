@@ -21,8 +21,10 @@ class GameStreamBuilder
           # front end doesn't use turn_ends
           opts[:turn_result].delete(:turn_ends)
         end
-      else
-        game_stream[key] = value
+      when :show_game
+        game_stream[:game] = stream_game
+        game_stream[:scored_cards] = stream_scored_cards
+        game_stream[:images_array] = stream_scored_cards_images
       end
     end
 
@@ -59,5 +61,24 @@ class GameStreamBuilder
       .select { |gc| gc.position.to_i > 0 }
       .sort_by(&:position)
       .map(&:stream_data)
+  end
+
+  def stream_scored_cards
+    @game.game_players.map do |game_player|
+      {
+        player_id: game_player.player.guest_id,
+        cards: @game.game_cards
+          .select { |gc| gc.scored_by == game_player.guest_id }
+          .sort_by(&:updated_at)
+          .map(&:stream_data)
+      }
+    end
+  end
+
+  def stream_scored_cards_images
+    @game.game_cards
+      .select { |gc| gc.scored_by.present? }
+      .map(&:image_url)
+      .uniq
   end
 end

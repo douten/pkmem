@@ -11,11 +11,11 @@ module GameStateValidations
     validates :state, inclusion: { in: %w[playing error],
         message: ->(object, _) { state_machine_error_message(object) }
       }, if: -> { state_changed? && state_was == "matching" }
-    # # playing -> finished, abandoned, error
+    # playing -> finished, abandoned, conceded, error
     validates :state, inclusion: { in: TERMINAL_STATES,
         message: ->(object, _) { state_machine_error_message(object) }
       }, if: -> { state_changed? && state_was == "playing" }
-    # finished, abandoned, error -> no transitions
+    # finished, conceded, abandoned, error -> no transitions
     validates :state, inclusion: { in: [],
         message: ->(object, _) { state_machine_error_message(object) }
       }, if: -> { state_changed? && TERMINAL_STATES.include?(state_was) }
