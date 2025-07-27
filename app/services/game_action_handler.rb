@@ -110,7 +110,7 @@ class GameActionHandler
     if current_player && opponent_player
       current_player.update({ score: 0 })
       opponent_player.update({ score: 15 })
-      game.update({ state: "conceded" })
+      game.update({ state: "conceded", turn: current_player.guest_id })
       game.reload
       true
     else
