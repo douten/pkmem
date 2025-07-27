@@ -1,6 +1,6 @@
 class GamesChannel < ApplicationCable::Channel
   after_subscribe :handle_player_connection, unless: :subscription_rejected?
-  after_unsubscribe :handle_player_disconnection
+  after_unsubscribe :handle_player_disconnection, unless: :subscription_rejected?
 
   # CHANNEL CALLBACKS
   def subscribed
