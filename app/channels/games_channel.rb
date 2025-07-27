@@ -22,8 +22,8 @@ class GamesChannel < ApplicationCable::Channel
       @game.update(state: "playing")
     end
 
-    no_opts_states = @game.finished? || @game.abandoned?
-    opts = no_opts_states ? {} : broadcast_opts_params
+    terminated_game = @game.finished? || @game.abandoned?
+    opts = terminated_game ? { show_game: true } : { init_game: true }
 
     broadcast_game(opts) unless @game.error?
   end
@@ -124,12 +124,5 @@ class GamesChannel < ApplicationCable::Channel
 
   def current_player
     connection.player
-  end
-
-  def broadcast_opts_params
-    # ex: { init_game: true }
-    ActionController::Parameters.new(params[:opts] || {})
-      .permit(:init_game) # expand here if needed
-      .to_h.symbolize_keys
   end
 end

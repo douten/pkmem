@@ -4,16 +4,23 @@ class GameStreamBuilder
   end
 
   def build(opts = {})
-    game_stream = {
-      game: stream_game
-    }
+    game_stream = {}
 
     opts.each do |key, value|
       case key
       when :init_game
+        game_stream[:game] = stream_game
         game_stream[:init_cards] = stream_cards
         game_stream[:images_array] = @game.cards.map { |card| card.image_url(@game.id) }
         next
+      when :turn_result
+        game_stream[:turn_result] = value
+
+        if value[:turn_ends]
+          game_stream[:game] = stream_game
+          # front end doesn't use turn_ends
+          opts[:turn_result].delete(:turn_ends)
+        end
       else
         game_stream[key] = value
       end

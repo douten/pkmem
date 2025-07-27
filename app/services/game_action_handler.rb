@@ -33,6 +33,7 @@ class GameActionHandler
     opponent_player = game.players.find { |p| p.guest_id != player.guest_id }
 
     new_cards_to_add = []
+    turn_ends = false
 
     if non_matching_cards.length > 0
       # resetting cards since they don't match
@@ -42,7 +43,8 @@ class GameActionHandler
           face_up: false
         })
       end
-      game.update({ turn: opponent_player.guest_id })
+
+      turn_ends = game.update({ turn: opponent_player.guest_id })
     elsif cards_match_whole_set
       # If all flipped cards match, we score the cards
       puts "Cards matched by player #{player.guest_id}."
@@ -73,7 +75,7 @@ class GameActionHandler
         used_card_sets.concat(unpositioned_card.card.card_sets)
       end
 
-      game.update({ turn: player.guest_id })
+      turn_ends = game.update({ turn: player.guest_id })
     end
 
     player_scored_game_cards = game.game_cards.select { |gc| gc.scored_by == player.guest_id }.length
@@ -98,6 +100,7 @@ class GameActionHandler
       new_cards_to_add:,
       cards_match_whole_set:,
       no_match: non_matching_cards.length > 0,
+      turn_ends:
     )
   end
 
@@ -159,7 +162,7 @@ class GameActionHandler
     # set positions for the first 16 cards
     game.game_cards.each_with_index do |game_card, index|
       game_card.position = index + 1
-      game_card.save
+      game_card.save!
     end
 
     game.cards.concat(remaining_cards.shuffle)
@@ -205,11 +208,12 @@ class GameActionHandler
 
   private
 
-  def self.turn_results(game:, current_player:, new_cards_to_add: [], cards_match_whole_set: false, no_match: false)
+  def self.turn_results(game:, current_player:, new_cards_to_add: [], cards_match_whole_set: false, no_match: false, turn_ends: false)
     # interface GameTurnResultInterface
     results = {
       cards_match_whole_set:,
-      no_match:
+      no_match:,
+      turn_ends:
     }
     results[:new_cards_to_add] = new_cards_to_add.present? ? new_cards_to_add.map(&:stream_data) : []
     results[:flipped_game_cards] = GameActionHandler.flipped_game_cards(game, current_player).map(&:stream_data)
