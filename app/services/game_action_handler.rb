@@ -23,7 +23,22 @@ class GameActionHandler
 
     # We're going to use the evolution_sets to determine if the cards match
     needle = player_flipped_game_cards.map(&:number)
-    flipped_cards_no_match_evo_set = evolution_sets.none? { |set| needle.all? { |n| set.include?(n) } }
+
+    flipped_cards_no_match_evo_set = evolution_sets.none? do |set|
+      # Example 1: Wild set (all same number)
+      # set = [108], needle = [108, 108] => true (wild set, needle all same)
+      (set.uniq.length == 1 && needle.all? { |n| n == set.first }) ||
+
+      # Example 2: Exact match (same numbers and counts)
+      # set = [43, 44], needle = [43, 44] => true (exact match)
+      # set = [43, 44, 45], needle = [43, 44] => false (not exact, set has extra)
+      set.tally == needle.tally ||
+
+      # Subset match: needle is a subset of set
+      # set = [43, 44, 45], needle = [43, 44] => true (subset match)
+      needle.tally.all? { |num, count| set.tally[num].to_i >= count }
+    end
+
     cards_match_whole_set = evolution_sets.any? do |set|
       if set.uniq.length == 1 && needle.all? { |n| n == set.first }
         true
