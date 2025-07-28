@@ -23,7 +23,7 @@ class GamesChannel < ApplicationCable::Channel
     end
 
     terminated_game = @game.finished? || @game.abandoned? || @game.conceded?
-    opts = terminated_game ? { show_game: true } : { init_game: true }
+    opts = terminated_game ? {} : { init_game: true }
 
     broadcast_game(opts) unless @game.error?
   end

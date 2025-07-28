@@ -22,15 +22,11 @@ class GameCard < ApplicationRecord
   #   flipped_game_cards.
 
   def image_url
-    if self.face_up?
-      self.card.image_url(self.game_id)
-    else
-      nil
-    end
+    self.card.image_url(self.game_id)
   end
 
-  def evolution_number_set
-    self.card.evolution_number_set
+  def evolution_sets
+    self.card.evolution_sets
   end
 
   def evolution_line_count
@@ -50,5 +46,9 @@ class GameCard < ApplicationRecord
 
   def name
     self.card.name
+  end
+
+  def number
+    self.card.number
   end
 end

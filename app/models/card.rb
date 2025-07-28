@@ -26,16 +26,7 @@ class Card < ApplicationRecord
     end
   end
 
-  def evolution_number_set
-    self.card_sets.flat_map { |set| set.cards.map(&:number) }.uniq
-  end
-
-  def evolution_line_count
-    # we need this to see the max cards flipped already.
-    # EX: evolution_number_set can be [43, 44, 45, 182] for oddish
-    # but the evolution line is only 3. Split between 45 and 182.
-    # So we can't use evolution_number_set length to know if the amount
-    # of cards flipped is enough to match the set. As it'll expect 4 cards.
-    self.card_sets.map { |cs| cs.cards.map(&:number) }.map(&:length).max
+  def evolution_sets
+    self.card_sets.map { |set| set.cards.map(&:number) }
   end
 end

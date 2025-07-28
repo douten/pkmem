@@ -19,23 +19,24 @@ class GameActionHandler
       player_flipped_game_cards.length < 2
 
     # Find the matching set of the flipped cards. In the future we can
-    matching_number_set = player_flipped_game_cards.last.evolution_number_set
+    evolution_sets = player_flipped_game_cards.last.evolution_sets
 
-    # If there's a flipped card that doesn't match the set then it's a sign
-    # the player can't continue flipping cards
-    non_matching_cards = player_flipped_game_cards.select do |flipped_game_card|
-      !matching_number_set.include?(flipped_game_card.card.number)
+    # We're going to use the evolution_sets to determine if the cards match
+    needle = player_flipped_game_cards.map(&:number)
+    flipped_cards_no_match_evo_set = evolution_sets.none? { |set| needle.all? { |n| set.include?(n) } }
+    cards_match_whole_set = evolution_sets.any? do |set|
+      if set.uniq.length == 1 && needle.all? { |n| n == set.first }
+        true
+      else
+        set.tally == needle.tally
+      end
     end
 
-    cards_match_whole_set = non_matching_cards.length == 0 &&
-      player_flipped_game_cards.length >= player_flipped_game_cards.first.evolution_line_count
-
     opponent_player = game.players.find { |p| p.guest_id != player.guest_id }
-
     new_cards_to_add = []
     turn_ends = false
 
-    if non_matching_cards.length > 0
+    if flipped_cards_no_match_evo_set
       # resetting cards since they don't match
       player_flipped_game_cards.each do |game_card|
         game_card.update({
@@ -92,14 +93,15 @@ class GameActionHandler
         game_player.update({ score: score })
       end
 
-      game.update({ state: "finished" })
+      game.update!({ state: "finished" })
+      game.reload
     end
 
     self.turn_results(game: game,
       current_player: player,
       new_cards_to_add:,
       cards_match_whole_set:,
-      no_match: non_matching_cards.length > 0,
+      no_match: flipped_cards_no_match_evo_set,
       turn_ends:
     )
   end
@@ -113,7 +115,7 @@ class GameActionHandler
     if current_player && opponent_player
       current_player.update({ score: 0 })
       opponent_player.update({ score: 15 })
-      game.update({ state: "conceded", turn: current_player.guest_id })
+      game.update!({ state: "conceded", turn: current_player.guest_id })
       game.reload
       true
     else
@@ -178,16 +180,14 @@ class GameActionHandler
     return false if player.nil? || !game.playing? || !has_turn
     return true if player_flipped_game_cards.length < 2
 
-    # we can just check for the first flipped card's matching number set
-    # as all cards need to match *a* set
-    matching_number_set = player_flipped_game_cards&.first.evolution_number_set
-    # any flipped cards that doesn't match the first flipped card's set
-    non_matching_cards = player_flipped_game_cards.select do |flipped_game_card|
-      !matching_number_set.include?(flipped_game_card.card.number)
-    end
+    # Find the matching set of the flipped cards. In the future we can
+    evolution_sets = player_flipped_game_cards.last.evolution_sets
+
+    needle = player_flipped_game_cards.map(&:number)
+    flipped_cards_no_match_evo_set = evolution_sets.none? { |set| needle.all? { |n| set.include?(n) } }
     # when 2+ cards are flipped, and there's a non-matching card
     # then the set does not match
-    non_matching_set = non_matching_cards.length > 0 && player_flipped_game_cards.length > 1
+    non_matching_set = flipped_cards_no_match_evo_set && player_flipped_game_cards.length > 1
 
     # in order for a player to flip cards:
     # 1. they must have the turn
@@ -227,7 +227,7 @@ class GameActionHandler
     # default is 2 unless there's a set of 3
     max = 2
 
-    if self.flipped_game_cards(game).length > 0 && self.flipped_game_cards(game).first.evolution_number_set.length > 2
+    if self.flipped_game_cards(game).length > 0 && self.flipped_game_cards(game).first.evolution_sets.max_by(&:length).length >= 3
       max = 3
     end
 

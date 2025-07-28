@@ -21,11 +21,13 @@ class GameStreamBuilder
           # front end doesn't use turn_ends
           opts[:turn_result].delete(:turn_ends)
         end
-      when :show_game
-        game_stream[:game] = stream_game
-        game_stream[:scored_cards] = stream_scored_cards
-        game_stream[:images_array] = stream_scored_cards_images
       end
+    end
+
+    if @game.finished? || @game.abandoned? || @game.conceded?
+      game_stream[:game] = stream_game
+      game_stream[:scored_cards] = stream_scored_cards
+      game_stream[:images_array] = stream_scored_cards_images
     end
 
     game_stream
