@@ -22,7 +22,7 @@ class GamesChannel < ApplicationCable::Channel
       @game.update(state: "playing")
     end
 
-    terminated_game = @game.finished? || @game.abandoned?
+    terminated_game = @game.finished? || @game.abandoned? || @game.conceded?
     opts = terminated_game ? { show_game: true } : { init_game: true }
 
     broadcast_game(opts) unless @game.error?
@@ -66,7 +66,7 @@ class GamesChannel < ApplicationCable::Channel
       game_player.player.update(status: "inactive")
     end
 
-    broadcast_game
+    broadcast_game(show_game: true)
   end
 
   private

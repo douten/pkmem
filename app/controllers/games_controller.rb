@@ -5,7 +5,7 @@ class GamesController < ApplicationController
 
     if game && player && game.players.include?(player)
       GamesChannel.broadcast_to(game,
-        games_channel: { **GameStreamBuilder.new(game).build }
+        games_channel: { **GameStreamBuilder.new(game).build(show_game: true) }
       ) if GameActionHandler.concede(game, player)
       render json: { status: "success", message: "Game conceded successfully." }, status: :ok
     else
